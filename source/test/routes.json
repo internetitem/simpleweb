@@ -1,0 +1,15 @@
+{
+	handlers: [
+		{
+			name: 'test',
+			className: 'com.internetitem.simpleweb.test.TestHandler'
+		}
+	],
+	matches: [
+		{
+			pattern: '/test',
+			handler: 'test',
+			method: 'test1'
+		}
+	]
+}

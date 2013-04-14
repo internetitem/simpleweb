@@ -1,9 +1,12 @@
-package com.internetitem.simpleweb.router;
+package com.internetitem.simpleweb.response;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.List;
+
+import com.internetitem.simpleweb.router.Response;
+import com.internetitem.simpleweb.router.ResponseHeader;
 
 public class StaticDataResponse implements Response {
 

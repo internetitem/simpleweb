@@ -3,6 +3,7 @@ package com.internetitem.simpleweb.router;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -71,8 +72,12 @@ public class HandlerDispatcher {
 		}
 
 		resp.setContentType(response.getContentType());
-		for (ResponseHeader header : response.getHeaders()) {
-			resp.setHeader(header.getName(), header.getValue());
+
+		Collection<ResponseHeader> headers = response.getHeaders();
+		if (headers != null) {
+			for (ResponseHeader header : headers) {
+				resp.setHeader(header.getName(), header.getValue());
+			}
 		}
 		response.writeResponse(resp.getOutputStream());
 	}

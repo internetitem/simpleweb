@@ -8,9 +8,14 @@ import java.util.regex.Pattern;
 public class Router {
 
 	private List<Pattern> patterns;
-	private List<String> handlerNames;
+	private List<HandlerInfo> handlers;
 
-	public HandlerDispatcher routeRequest(String method, String path) throws HttpError {
+	public Router() {
+		this.patterns = new ArrayList<>();
+		this.handlers = new ArrayList<>();
+	}
+
+	public HandlerDispatcher routeRequest(String httpMethod, String path) throws HttpError {
 		int numPatterns = patterns.size();
 		for (int i = 0; i < numPatterns; i++) {
 			Pattern pattern = patterns.get(i);
@@ -24,10 +29,25 @@ public class Router {
 			for (int g = 1; g <= numGroups; g++) {
 				pieces.add(matcher.group(g));
 			}
-			String handlerName = handlerNames.get(i);
-			return new HandlerDispatcher(handlerName, method, path, pieces);
+			HandlerInfo handler = handlers.get(i);
+			return new HandlerDispatcher(handler.handlerName, handler.methodName, path, pieces);
 		}
 		throw new HttpError("Not Found", 404);
+	}
+
+	public void addRoute(String pattern, String handlerName, String methodName) {
+		patterns.add(Pattern.compile(pattern));
+		handlers.add(new HandlerInfo(handlerName, methodName));
+	}
+
+	private class HandlerInfo {
+		private String handlerName;
+		private String methodName;
+
+		public HandlerInfo(String handlerName, String methodName) {
+			this.handlerName = handlerName;
+			this.methodName = methodName;
+		}
 	}
 
 }

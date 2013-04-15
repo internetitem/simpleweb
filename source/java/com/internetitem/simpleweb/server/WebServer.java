@@ -1,8 +1,12 @@
 package com.internetitem.simpleweb.server;
 
 import org.eclipse.jetty.server.Server;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WebServer {
+
+	private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
 
 	public static void main(String[] args) throws Exception {
 		Server server = new Server(8080);
@@ -12,8 +16,13 @@ public class WebServer {
 		server.setStopTimeout(1000);
 		server.setStopAtShutdown(true);
 
-		server.start();
-		server.join();
+		try {
+			server.start();
+			server.join();
+		} catch (Exception e) {
+			logger.error("Failed to start server: " + e.getMessage(), e);
+			server.stop();
+		}
 	}
 
 }

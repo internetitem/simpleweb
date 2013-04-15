@@ -4,9 +4,9 @@ import org.eclipse.jetty.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WebServer {
+public class SimpleWebServer {
 
-	private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
+	private static final Logger logger = LoggerFactory.getLogger(SimpleWebServer.class);
 
 	public static void main(String[] args) throws Exception {
 		Server server = new Server(8080);

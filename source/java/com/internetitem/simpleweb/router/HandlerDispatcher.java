@@ -89,7 +89,7 @@ public class HandlerDispatcher {
 				continue;
 			}
 
-			if (!method.getReturnType().isAssignableFrom(Response.class)) {
+			if (!Response.class.isAssignableFrom(method.getReturnType())) {
 				continue;
 			}
 

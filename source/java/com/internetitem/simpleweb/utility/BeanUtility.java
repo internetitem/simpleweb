@@ -6,8 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.internetitem.simpleweb.utility.converter.ObjectConverter;
+
 public class BeanUtility {
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void injectParameters(Object obj, Map<String, Object> map, List<? extends ObjectConverter> converters) {
 		Class<?> clazz = obj.getClass();
 		Method[] methods = clazz.getMethods();

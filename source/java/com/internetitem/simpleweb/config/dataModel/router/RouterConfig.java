@@ -1,10 +1,10 @@
-package com.internetitem.simpleweb.config.dataModel;
+package com.internetitem.simpleweb.config.dataModel.router;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 
-import com.google.gson.GsonBuilder;
+import com.internetitem.simpleweb.utility.JsonUtility;
 
 public class RouterConfig {
 	private List<RouterHandler> handlers;
@@ -27,6 +27,6 @@ public class RouterConfig {
 	}
 
 	public static RouterConfig parseFromStream(Reader reader) throws IOException {
-		return new GsonBuilder().create().fromJson(reader, RouterConfig.class);
+		return JsonUtility.gson.fromJson(reader, RouterConfig.class);
 	}
 }

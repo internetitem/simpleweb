@@ -1,4 +1,4 @@
-package com.internetitem.simpleweb.config.dataModel;
+package com.internetitem.simpleweb.config.dataModel.router;
 
 public class RouterMatch {
 	private String pattern;

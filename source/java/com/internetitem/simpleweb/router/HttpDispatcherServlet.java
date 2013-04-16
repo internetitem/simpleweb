@@ -1,8 +1,6 @@
 package com.internetitem.simpleweb.router;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Map;
 
 import javax.servlet.ServletConfig;
@@ -12,6 +10,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.internetitem.simpleweb.config.Configuration;
+import com.internetitem.simpleweb.config.ConfigurationException;
+import com.internetitem.simpleweb.config.ConfigurationFactory;
+import com.internetitem.simpleweb.config.ConfigurationParameters;
+import com.internetitem.simpleweb.config.ServletContextConfigurationParameters;
 
 public class HttpDispatcherServlet extends HttpServlet {
 
@@ -20,17 +22,15 @@ public class HttpDispatcherServlet extends HttpServlet {
 
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
-		InputStream stream = Configuration.class.getResourceAsStream("/routes.json");
+		ConfigurationParameters params = new ServletContextConfigurationParameters(servletConfig);
+		Configuration config;
 		try {
-			if (stream == null) {
-				throw new IOException("Unable to load /routes.json");
-			}
-			Configuration config = new Configuration(new InputStreamReader(stream, "UTF-8"));
-			router = config.getRouter();
-			handlers = config.getHandlers();
-		} catch (IOException e) {
+			config = ConfigurationFactory.getConfiguration(params);
+		} catch (ConfigurationException e) {
 			throw new ServletException(e);
 		}
+		router = config.getRouter();
+		handlers = config.getHandlers();
 	}
 
 	void handleRequest(String method, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

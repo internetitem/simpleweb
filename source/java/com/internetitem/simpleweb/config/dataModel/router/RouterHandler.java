@@ -1,4 +1,4 @@
-package com.internetitem.simpleweb.config.dataModel;
+package com.internetitem.simpleweb.config.dataModel.router;
 
 public class RouterHandler {
 	private String name;

@@ -2,19 +2,32 @@ package com.internetitem.simpleweb.utility;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import com.internetitem.simpleweb.utility.converter.ObjectConverter;
+import com.internetitem.simpleweb.utility.converter.StringToBoolean;
+import com.internetitem.simpleweb.utility.converter.StringToInteger;
+import com.internetitem.simpleweb.utility.converter.StringToPrimitiveBoolean;
+import com.internetitem.simpleweb.utility.converter.StringToPrimitiveInt;
 
 public class BeanUtility {
 
+	public static final List<ObjectConverter<?, ?>> STANDARD_STRING_CONVERTERS = new ArrayList<>();
+	static {
+		STANDARD_STRING_CONVERTERS.add(new StringToBoolean());
+		STANDARD_STRING_CONVERTERS.add(new StringToInteger());
+		STANDARD_STRING_CONVERTERS.add(new StringToPrimitiveBoolean());
+		STANDARD_STRING_CONVERTERS.add(new StringToPrimitiveInt());
+	}
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static void injectParameters(Object obj, Map<String, Object> map, List<? extends ObjectConverter> converters) {
+	public static void injectParameters(Object obj, Map<String, ? extends Object> map, List<? extends ObjectConverter> converters) {
 		Class<?> clazz = obj.getClass();
 		Method[] methods = clazz.getMethods();
-		for (Entry<String, Object> entry : map.entrySet()) {
+		for (Entry<String, ? extends Object> entry : map.entrySet()) {
 			String name = entry.getKey();
 			Object rawValue = entry.getValue();
 			String setterName = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
@@ -64,5 +77,16 @@ public class BeanUtility {
 				}
 			}
 		}
+	}
+
+	public static <T> T createObject(String className, Class<T> clazz, Map<String, String> parameters) throws Exception {
+		Class<?> objClass = Class.forName(className);
+		if (!clazz.isAssignableFrom(objClass)) {
+			throw new Exception("Class " + className + " is not a " + clazz.getName());
+		}
+		Object obj = objClass.newInstance();
+		injectParameters(obj, parameters, STANDARD_STRING_CONVERTERS);
+		T newObj = clazz.cast(obj);
+		return newObj;
 	}
 }

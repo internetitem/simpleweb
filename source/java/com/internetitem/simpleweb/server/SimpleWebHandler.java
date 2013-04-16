@@ -1,8 +1,7 @@
 package com.internetitem.simpleweb.server;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -13,6 +12,10 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
 import com.internetitem.simpleweb.config.Configuration;
+import com.internetitem.simpleweb.config.ConfigurationException;
+import com.internetitem.simpleweb.config.ConfigurationFactory;
+import com.internetitem.simpleweb.config.ConfigurationParameters;
+import com.internetitem.simpleweb.config.MapConfigurationParameters;
 import com.internetitem.simpleweb.router.HandlerDispatcher;
 import com.internetitem.simpleweb.router.HttpError;
 import com.internetitem.simpleweb.router.RequestHandler;
@@ -23,12 +26,9 @@ public class SimpleWebHandler extends AbstractHandler {
 	private Router router;
 	private Map<String, RequestHandler> handlers;
 
-	public SimpleWebHandler() throws IOException {
-		InputStream stream = Configuration.class.getResourceAsStream("/routes.json");
-		if (stream == null) {
-			throw new IOException("Unable to load /routes.json");
-		}
-		Configuration config = new Configuration(new InputStreamReader(stream, "UTF-8"));
+	public SimpleWebHandler() throws ConfigurationException {
+		ConfigurationParameters params = new MapConfigurationParameters(new HashMap<String, String>());
+		Configuration config = ConfigurationFactory.getConfiguration(params);
 		router = config.getRouter();
 		handlers = config.getHandlers();
 	}

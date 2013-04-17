@@ -6,10 +6,9 @@
 		}
 	],
 	matches: [
-		{
-			pattern: '/test',
-			handler: 'test',
-			method: 'test1'
-		}
+		{ pattern: '/test/?', handler: 'test', method: 'test1', args: {which: '1'} },
+		{ pattern: '/test/:foo', handler: 'test', method: 'test1', args: {which: '2'} },
+		{ pattern: '/test/which/:which', handler: 'test', method: 'test1', args: {which: '3'} },
+		{ pattern: '/test/*', handler: 'test', method: 'test1', args: {which: '4'} }
 	]
 }

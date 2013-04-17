@@ -1,9 +1,12 @@
 package com.internetitem.simpleweb.config.dataModel.router;
 
+import java.util.Map;
+
 public class RouterMatch {
 	private String pattern;
 	private String handler;
 	private String method;
+	private Map<String, String> args;
 
 	public String getPattern() {
 		return pattern;
@@ -27,6 +30,14 @@ public class RouterMatch {
 
 	public void setMethod(String method) {
 		this.method = method;
+	}
+
+	public Map<String, String> getArgs() {
+		return args;
+	}
+
+	public void setArgs(Map<String, String> args) {
+		this.args = args;
 	}
 
 }

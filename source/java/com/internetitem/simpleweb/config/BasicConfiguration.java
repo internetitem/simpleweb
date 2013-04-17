@@ -54,10 +54,11 @@ public class BasicConfiguration implements Configuration {
 					String pattern = match.getPattern();
 					String handlerName = match.getHandler();
 					String methodName = match.getMethod();
+					Map<String, String> args = match.getArgs();
 					if (!handlers.containsKey(handlerName)) {
 						throw new IOException("Handler [" + handlerName + "] for pattern [" + pattern + "] does not exist");
 					}
-					router.addRoute(pattern, handlerName, methodName);
+					router.addRoute(pattern, handlerName, methodName, args);
 				}
 			}
 		} catch (Exception e) {

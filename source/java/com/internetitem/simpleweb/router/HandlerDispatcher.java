@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -15,13 +16,15 @@ public class HandlerDispatcher {
 	private String handlerName;
 	private String methodName;
 	private String path;
-	private List<String> pieces;
+	private Map<String, String> pieces;
+	private Map<String, String> args;
 
-	public HandlerDispatcher(String handlerName, String methodName, String path, List<String> pieces) {
+	public HandlerDispatcher(String handlerName, String methodName, String path, Map<String, String> pieces, Map<String, String> args) {
 		this.handlerName = handlerName;
 		this.methodName = methodName;
 		this.path = path;
 		this.pieces = pieces;
+		this.args = args;
 	}
 
 	public String getHandlerName() {
@@ -36,8 +39,12 @@ public class HandlerDispatcher {
 		return path;
 	}
 
-	public List<String> getPieces() {
+	public Map<String, String> getPieces() {
 		return pieces;
+	}
+
+	public Map<String, String> getArgs() {
+		return args;
 	}
 
 	public void dispatchRequest(RequestHandler handler, HttpServletRequest req, HttpServletResponse resp) throws HttpError, ServletException, IOException {
@@ -57,8 +64,13 @@ public class HandlerDispatcher {
 				parameterValues[i] = resp;
 			} else if (paramType.isAssignableFrom(String.class)) {
 				parameterValues[i] = path;
-			} else if (paramType.isAssignableFrom(String[].class)) {
-				parameterValues[i] = pieces.toArray(new String[0]);
+			} else if (paramType.isAssignableFrom(Map.class)) {
+				Map<String, String> argMap = new HashMap<>();
+				if (args != null) {
+					argMap.putAll(args);
+				}
+				argMap.putAll(pieces);
+				parameterValues[i] = argMap;
 			} else {
 				throw new ServletException("Unknown type " + paramType.getName() + " for method " + methodName + " in handler " + handlerName);
 			}

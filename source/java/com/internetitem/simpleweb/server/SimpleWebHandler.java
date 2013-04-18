@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.jws.WebMethod;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
+import com.internetitem.simpleweb.annotation.ControllerOptions;
 import com.internetitem.simpleweb.config.Configuration;
 import com.internetitem.simpleweb.config.ConfigurationException;
 import com.internetitem.simpleweb.config.ConfigurationFactory;
@@ -52,9 +54,10 @@ public class SimpleWebHandler extends AbstractHandler {
 			Map<String, String> params = dispatcher.getParams();
 
 			ControllerBase controller = getController(controllerMap, params, path);
+			boolean exposeAll = getExposeAll(controller);
 			String controllerName = params.get("internal:controller");
 
-			Method method = getMethod(controller, params, controllerName, path);
+			Method method = getMethod(controller, params, controllerName, path, exposeAll);
 			String methodName = params.get("internal:method");
 
 			dispatchInternal(controller, method, path, dispatcher.getParams(), controllerName, methodName, request, response);
@@ -65,19 +68,27 @@ public class SimpleWebHandler extends AbstractHandler {
 		}
 	}
 
-	private static Method getMethod(ControllerBase controller, Map<String, String> params, String controllerName, String path) throws ServletException {
+	private static boolean getExposeAll(ControllerBase controller) {
+		ControllerOptions options = controller.getClass().getAnnotation(ControllerOptions.class);
+		if (options == null) {
+			return true;
+		}
+		return options.exposeAll();
+	}
+
+	private static Method getMethod(ControllerBase controller, Map<String, String> params, String controllerName, String path, boolean exposeAll) throws ServletException {
 		String methodName = params.get("action");
 		if (methodName == null) {
 			methodName = "index";
 		}
-		Method method = findMethod(controller, methodName);
+		Method method = findMethod(controller, methodName, exposeAll);
 
 		if (method != null) {
 			params.put("internal:method", methodName);
 			return method;
 		} else {
 			String invalidMethodName = params.get("invalid:action");
-			method = findMethod(controller, invalidMethodName);
+			method = findMethod(controller, invalidMethodName, exposeAll);
 			if (method == null) {
 				throw new ServletException("Unable to find action [" + methodName + "] in controller [" + controllerName + "]");
 			}
@@ -146,7 +157,7 @@ public class SimpleWebHandler extends AbstractHandler {
 		response.writeResponse(resp.getOutputStream());
 	}
 
-	private static Method findMethod(ControllerBase controller, String methodName) {
+	private static Method findMethod(ControllerBase controller, String methodName, boolean exposeAll) {
 		Class<? extends ControllerBase> controllerClass = controller.getClass();
 		for (Method method : controllerClass.getMethods()) {
 			if (!method.getName().equals(methodName)) {
@@ -157,8 +168,20 @@ public class SimpleWebHandler extends AbstractHandler {
 				continue;
 			}
 
+			if (!isMethodExposed(method, exposeAll)) {
+				continue;
+			}
+
 			return method;
 		}
 		return null;
+	}
+
+	private static boolean isMethodExposed(Method method, boolean exposeAll) {
+		if (exposeAll) {
+			return true;
+		}
+		WebMethod webMethod = method.getAnnotation(WebMethod.class);
+		return (webMethod != null);
 	}
 }

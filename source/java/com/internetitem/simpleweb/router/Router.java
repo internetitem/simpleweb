@@ -40,17 +40,7 @@ public class Router {
 				throw new HttpRedirect(newUrl);
 			}
 
-			String controllerName = pieces.get("controller");
-			if (controllerName == null) {
-				throw new HttpError("No controller mapped for path " + path, 500);
-			}
-
-			String methodName = pieces.get("action");
-			if (methodName == null) {
-				methodName = "index";
-			}
-
-			return new ControllerDispatcher(controllerName, methodName, path, pieces);
+			return new ControllerDispatcher(path, pieces);
 		}
 		throw new HttpError("Not Found", 404);
 	}

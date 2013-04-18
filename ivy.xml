@@ -9,6 +9,6 @@
 		<dependency org="org.eclipse.jetty" name="jetty-server" rev="9.0.0.v20130308"/>
 		<dependency org="org.slf4j" name="slf4j-api" rev="1.7.5"/>
 		<dependency org="ch.qos.logback" name="logback-classic" rev="1.0.11" conf="default->default,sources"/>
-		<dependency org="com.floreysoft" name="jmte" rev="3.0" conf="default->default"/>
+		<dependency org="com.floreysoft" name="jmte" rev="3.0" conf="default->default,sources"/>
 	</dependencies>
 </ivy-module>

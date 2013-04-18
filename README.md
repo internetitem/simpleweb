@@ -8,7 +8,7 @@ At this point, this project is a toy for experimenting with building a very basi
 
  * Simple routing using a simple syntax
  * Controllers are just regular objects with methods that can take a number of different types of arguments
- * Routes direct requests to the controller and handler method
+ * Routes direct requests to the controller and controller method
 
 ## Future Ideas ##
 
@@ -21,16 +21,16 @@ You can implement your own configuration class by implementing the `Configuratio
 
 ### Routes ###
 
-Each route maps a set of URLs to a named method within a handler class. Each handler class is defined and is then referenced by name.
+Each route maps a set of URLs to a named method within a controller class. Each controller class is defined and is then referenced by name.
 
 Routes are checked in the order that they were defined, and the first matching route wins. Each route expects the following keys:
 
  * pattern - A pattern to match
- * handler - The name of the handler that was previously defined
- * method - The method to call within that handler
+ * controller - The name of the controller that was previously defined
+ * action - The method to call within that controller
  * args - (optional) a map that can be passed into the method (if the method defines a `Map` parameter)
 
 #### Route Syntax ####
 
-A route contains a number of "parts", each separated by slashes. Each part can be a string of characters or a "`*`". The string of characters may contain a label like "`:id`", and any text matched in the place of the `:id` will be passed into the `args` `Map` (if specified) of the handler method. Any part (except "`*`", which may only occur once in a URL and is always considered optional) may contain a "`?`" at the end to indicate that the part is optional. Note that once an optional part is found, all parts that follow are always optional.
+A route contains a number of "parts", each separated by slashes. Each part can be a string of characters or a "`*`". The string of characters may contain a label like "`:id`", and any text matched in the place of the `:id` will be passed into the `args` `Map` (if specified) of the controller method. Any part (except "`*`", which may only occur once in a URL and is always considered optional) may contain a "`?`" at the end to indicate that the part is optional. Note that once an optional part is found, all parts that follow are always optional.
 

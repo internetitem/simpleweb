@@ -89,7 +89,7 @@ public class RequestHandler {
 		}
 	}
 
-	private static void dispatchInternal(ControllerBase controller, Method method, String path, Map<String, String> params, String controllerName, String methodName, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	private static void dispatchInternal(ControllerBase controller, Method method, String path, Map<String, String> params, String controllerName, String methodName, HttpServletRequest req, HttpServletResponse resp) throws HttpError, ServletException, IOException {
 		Class<?>[] parameterTypes = method.getParameterTypes();
 		int numParameters = parameterTypes.length;
 		Object[] parameterValues = new Object[numParameters];
@@ -111,8 +111,21 @@ public class RequestHandler {
 		Response response;
 		try {
 			response = (Response) method.invoke(controller, parameterValues);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+		} catch (IllegalAccessException | IllegalArgumentException e) {
 			throw new ServletException("Internal error processing " + controllerName + "." + methodName, e);
+		} catch (InvocationTargetException e) {
+			Throwable target = e.getTargetException();
+			try {
+				throw target;
+			} catch (IOException e2) {
+				throw e2;
+			} catch (ServletException e2) {
+				throw e2;
+			} catch (HttpError e2) {
+				throw e2;
+			} catch (Throwable t) {
+				throw new ServletException("Internal error processing " + controllerName + "." + methodName, e);
+			}
 		}
 
 		resp.setContentType(response.getContentType());

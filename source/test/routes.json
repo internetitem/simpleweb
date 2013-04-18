@@ -10,6 +10,8 @@
 		{ pattern: '/test/:foo', controller: 'test', action: 'test1', which: '2' },
 		{ pattern: '/test/which/:which', controller: 'test', action: 'test1', which: '3'},
 		{ pattern: '/test/*', controller: 'test', action: 'test1', which: '4' },
-		{ pattern: '/test2/:action', controller: 'test' }
+		{ pattern: '/test2/:action', controller: 'test' },
+		{ pattern: '/googleme?', redirect: 'http://www.google.com/' },
+		{ pattern: '/redirectme/:controller/:action', redirect: '/test/${controller}/${action}' }
 	]
 }

@@ -1,4 +1,4 @@
-package com.internetitem.simpleweb.router;
+package com.internetitem.simpleweb.router.exception;
 
 public class HttpError extends Exception {
 	private String message;

@@ -14,6 +14,7 @@ import com.internetitem.simpleweb.config.ConfigurationException;
 import com.internetitem.simpleweb.config.ConfigurationFactory;
 import com.internetitem.simpleweb.config.ConfigurationParameters;
 import com.internetitem.simpleweb.config.ServletContextConfigurationParameters;
+import com.internetitem.simpleweb.server.SimpleWebHandler;
 
 public class HttpDispatcherServlet extends HttpServlet {
 
@@ -34,18 +35,7 @@ public class HttpDispatcherServlet extends HttpServlet {
 	}
 
 	void handleRequest(String method, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		try {
-			ControllerDispatcher dispatcher = router.routeRequest(method, req.getPathInfo());
-			String controllerName = dispatcher.getControllerName();
-			ControllerBase controller = controllerMap.get(controllerName);
-			if (controller == null) {
-				throw new ServletException("No controller for " + controllerName);
-			}
-
-			dispatcher.dispatchRequest(controller, req, resp);
-		} catch (HttpError e) {
-			resp.sendError(e.getCode(), e.getMessage());
-		}
+		SimpleWebHandler.handleRequest(router, controllerMap, req, resp);
 	}
 
 	@Override

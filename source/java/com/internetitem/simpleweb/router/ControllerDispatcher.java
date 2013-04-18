@@ -10,6 +10,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.internetitem.simpleweb.router.exception.HttpError;
+
 public class ControllerDispatcher {
 
 	private String controllerName;

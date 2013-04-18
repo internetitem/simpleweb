@@ -6,12 +6,12 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Map;
 
-import javax.jws.WebMethod;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.internetitem.simpleweb.annotation.ControllerOptions;
+import com.internetitem.simpleweb.annotation.WebAction;
 import com.internetitem.simpleweb.router.exception.HttpError;
 import com.internetitem.simpleweb.router.exception.HttpRedirect;
 
@@ -163,7 +163,7 @@ public class RequestHandler {
 		if (exposeAll) {
 			return true;
 		}
-		WebMethod webMethod = method.getAnnotation(WebMethod.class);
+		WebAction webMethod = method.getAnnotation(WebAction.class);
 		return (webMethod != null);
 	}
 }

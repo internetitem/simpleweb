@@ -1,14 +1,15 @@
 {
-	handlers: [
+	controllers: [
 		{
 			name: 'test',
-			className: 'com.internetitem.simpleweb.test.TestHandler'
+			className: 'com.internetitem.simpleweb.test.TestController'
 		}
 	],
 	matches: [
-		{ pattern: '/test/?', handler: 'test', method: 'test1', args: {which: '1'} },
-		{ pattern: '/test/:foo', handler: 'test', method: 'test1', args: {which: '2'} },
-		{ pattern: '/test/which/:which', handler: 'test', method: 'test1', args: {which: '3'} },
-		{ pattern: '/test/*', handler: 'test', method: 'test1', args: {which: '4'} }
+		{ pattern: '/test/?', controller: 'test', method: 'test1', which: '1' },
+		{ pattern: '/test/:foo', controller: 'test', method: 'test1', which: '2' },
+		{ pattern: '/test/which/:which', controller: 'test', method: 'test1', which: '3'},
+		{ pattern: '/test/*', controller: 'test', method: 'test1', which: '4' },
+		{ pattern: '/test2/:method', controller: 'test' }
 	]
 }

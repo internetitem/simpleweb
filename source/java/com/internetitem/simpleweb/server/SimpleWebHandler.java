@@ -16,34 +16,34 @@ import com.internetitem.simpleweb.config.ConfigurationException;
 import com.internetitem.simpleweb.config.ConfigurationFactory;
 import com.internetitem.simpleweb.config.ConfigurationParameters;
 import com.internetitem.simpleweb.config.MapConfigurationParameters;
-import com.internetitem.simpleweb.router.HandlerDispatcher;
+import com.internetitem.simpleweb.router.ControllerDispatcher;
 import com.internetitem.simpleweb.router.HttpError;
-import com.internetitem.simpleweb.router.RequestHandler;
+import com.internetitem.simpleweb.router.ControllerBase;
 import com.internetitem.simpleweb.router.Router;
 
 public class SimpleWebHandler extends AbstractHandler {
 
 	private Router router;
-	private Map<String, RequestHandler> handlers;
+	private Map<String, ControllerBase> controllerMap;
 
 	public SimpleWebHandler() throws ConfigurationException {
 		ConfigurationParameters params = new MapConfigurationParameters(new HashMap<String, String>());
 		Configuration config = ConfigurationFactory.getConfiguration(params);
 		router = config.getRouter();
-		handlers = config.getHandlers();
+		controllerMap = config.getControllerMap();
 	}
 
 	@Override
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		try {
-			HandlerDispatcher dispatcher = router.routeRequest(request.getMethod(), target);
-			String handlerName = dispatcher.getHandlerName();
-			RequestHandler handler = handlers.get(handlerName);
-			if (handler == null) {
-				throw new ServletException("No handler for " + handlerName);
+			ControllerDispatcher dispatcher = router.routeRequest(request.getMethod(), target);
+			String controllerName = dispatcher.getControllerName();
+			ControllerBase controller = controllerMap.get(controllerName);
+			if (controller == null) {
+				throw new ServletException("No controller for " + controllerName);
 			}
 
-			dispatcher.dispatchRequest(handler, request, response);
+			dispatcher.dispatchRequest(controller, request, response);
 		} catch (HttpError e) {
 			response.sendError(e.getCode(), e.getMessage());
 		}

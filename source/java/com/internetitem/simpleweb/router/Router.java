@@ -11,46 +11,53 @@ import com.internetitem.simpleweb.config.ConfigurationException;
 
 public class Router {
 
-	private List<HandlerInfo> handlers;
+	private List<ControllerInfo> controllers;
 
 	public Router() {
-		this.handlers = new ArrayList<>();
+		this.controllers = new ArrayList<>();
 	}
 
-	public HandlerDispatcher routeRequest(String httpMethod, String path) throws HttpError {
-		for (HandlerInfo handler : handlers) {
-			Matcher matcher = handler.pattern.matcher(path);
+	public ControllerDispatcher routeRequest(String httpMethod, String path) throws HttpError {
+		for (ControllerInfo controller : controllers) {
+			Matcher matcher = controller.pattern.matcher(path);
 			if (!matcher.matches()) {
 				continue;
 			}
 
-			Map<String, String> pieces = new HashMap<>();
+			Map<String, String> pieces = new HashMap<>(controller.params);
 			int groupNum = 1;
-			for (String partName : handler.partNames) {
+			for (String partName : controller.partNames) {
 				String value = matcher.group(groupNum);
 				pieces.put(partName, value);
 				groupNum++;
 			}
-			return new HandlerDispatcher(handler.handlerName, handler.methodName, path, pieces, handler.args);
+
+			String controllerName = pieces.get("controller");
+			if (controllerName == null) {
+				throw new HttpError("No controller mapped for path " + path, 500);
+			}
+
+			String methodName = pieces.get("method");
+			if (methodName == null) {
+				methodName = "index";
+			}
+
+			return new ControllerDispatcher(controllerName, methodName, path, pieces);
 		}
 		throw new HttpError("Not Found", 404);
 	}
 
-	public void addRoute(String pattern, String handlerName, String methodName, Map<String, String> args) throws ConfigurationException {
-		handlers.add(new HandlerInfo(handlerName, methodName, pattern, args));
+	public void addRoute(String pattern, Map<String, String> params) throws ConfigurationException {
+		controllers.add(new ControllerInfo(pattern, params));
 	}
 
-	private class HandlerInfo {
+	private class ControllerInfo {
 		private Pattern pattern;
 		private List<String> partNames;
-		private String handlerName;
-		private String methodName;
-		private Map<String, String> args;
+		private Map<String, String> params;
 
-		public HandlerInfo(String handlerName, String methodName, String stringPattern, Map<String, String> args) throws ConfigurationException {
-			this.handlerName = handlerName;
-			this.methodName = methodName;
-			this.args = args;
+		public ControllerInfo(String stringPattern, Map<String, String> params) throws ConfigurationException {
+			this.params = params;
 			parsePattern(stringPattern);
 		}
 
@@ -84,7 +91,7 @@ public class Router {
 				}
 
 				if (part.isEmpty()) {
-					throw new ConfigurationException("Route for handler " + handlerName + " method " + methodName + " contains an empty part");
+					throw new ConfigurationException("Route [" + stringPattern + "] contains an empty part");
 				}
 
 				if (optionalCount > 0) {
@@ -94,7 +101,7 @@ public class Router {
 				reBuilder.append("/");
 				if (part.equals("*")) {
 					if (foundStar) {
-						throw new ConfigurationException("Route for handler " + handlerName + " method " + methodName + " may only contain a single wildcard *");
+						throw new ConfigurationException("Route [" + stringPattern + "] may only contain a single wildcard *");
 					}
 					reBuilder.append("(.+?)?");
 					partNames.add("path");

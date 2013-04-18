@@ -1,6 +1,6 @@
 package com.internetitem.simpleweb.config.dataModel.router;
 
-public class RouterHandler {
+public class RouterController {
 	private String name;
 	private String className;
 

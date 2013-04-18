@@ -10,19 +10,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.internetitem.simpleweb.config.dataModel.router.RouterConfig;
-import com.internetitem.simpleweb.config.dataModel.router.RouterHandler;
-import com.internetitem.simpleweb.config.dataModel.router.RouterMatch;
-import com.internetitem.simpleweb.router.RequestHandler;
+import com.internetitem.simpleweb.config.dataModel.router.RouterController;
+import com.internetitem.simpleweb.router.ControllerBase;
 import com.internetitem.simpleweb.router.Router;
 
 public class BasicConfiguration implements Configuration {
 	private Router router;
-	private Map<String, RequestHandler> handlers;
+	private Map<String, ControllerBase> controllerMap;
 
 	private String configFilename;
 
 	public BasicConfiguration() {
-		this.handlers = new HashMap<>();
+		this.controllerMap = new HashMap<>();
 		this.router = new Router();
 	}
 
@@ -41,24 +40,21 @@ public class BasicConfiguration implements Configuration {
 
 				RouterConfig config = loadFromReader(reader);
 
-				for (RouterHandler handler : config.getHandlers()) {
-					String handlerName = handler.getName();
-					String className = handler.getClassName();
-					if (handlers.containsKey(handlerName)) {
-						throw new IOException("Handler [" + handlerName + "] already exists");
+				for (RouterController controllerInfo : config.getControllers()) {
+					String controllerName = controllerInfo.getName();
+					String className = controllerInfo.getClassName();
+					if (controllerMap.containsKey(controllerName)) {
+						throw new IOException("Controller [" + controllerName + "] already exists");
 					}
-					handlers.put(handlerName, buildHandler(handlerName, className));
+					controllerMap.put(controllerName, buildController(controllerName, className));
 				}
 
-				for (RouterMatch match : config.getMatches()) {
-					String pattern = match.getPattern();
-					String handlerName = match.getHandler();
-					String methodName = match.getMethod();
-					Map<String, String> args = match.getArgs();
-					if (!handlers.containsKey(handlerName)) {
-						throw new IOException("Handler [" + handlerName + "] for pattern [" + pattern + "] does not exist");
+				for (Map<String, String> match : config.getMatches()) {
+					String pattern = match.get("pattern");
+					if (pattern == null) {
+						throw new IOException("Found match with no pattern");
 					}
-					router.addRoute(pattern, handlerName, methodName, args);
+					router.addRoute(pattern, match);
 				}
 			}
 		} catch (Exception e) {
@@ -66,15 +62,15 @@ public class BasicConfiguration implements Configuration {
 		}
 	}
 
-	private RequestHandler buildHandler(String handlerName, String className) throws IOException {
+	private ControllerBase buildController(String controllerName, String className) throws IOException {
 		try {
 			Class<?> clazz = Class.forName(className);
-			if (!RequestHandler.class.isAssignableFrom(clazz)) {
-				throw new IOException("Unable to create handler [" + handlerName + "] of class [" + className + "]: Not an instance of " + RequestHandler.class.getName());
+			if (!ControllerBase.class.isAssignableFrom(clazz)) {
+				throw new IOException("Unable to create controller [" + controllerName + "] of class [" + className + "]: Not an instance of " + ControllerBase.class.getName());
 			}
-			return (RequestHandler) clazz.newInstance();
+			return (ControllerBase) clazz.newInstance();
 		} catch (Exception e) {
-			throw new IOException("Unable to create handler [" + handlerName + "] of class [" + className + "]: " + e.getMessage(), e);
+			throw new IOException("Unable to create controller [" + controllerName + "] of class [" + className + "]: " + e.getMessage(), e);
 		}
 	}
 
@@ -82,8 +78,8 @@ public class BasicConfiguration implements Configuration {
 		return RouterConfig.parseFromStream(reader);
 	}
 
-	public Map<String, RequestHandler> getHandlers() {
-		return handlers;
+	public Map<String, ControllerBase> getControllerMap() {
+		return controllerMap;
 	}
 
 	public Router getRouter() {

@@ -3,27 +3,28 @@ package com.internetitem.simpleweb.config.dataModel.router;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
+import java.util.Map;
 
 import com.internetitem.simpleweb.utility.JsonUtility;
 
 public class RouterConfig {
-	private List<RouterHandler> handlers;
-	private List<RouterMatch> matches;
+	private List<RouterController> controllers;
+	private List<Map<String, String>> matches;
 
-	public List<RouterMatch> getMatches() {
+	public List<Map<String, String>> getMatches() {
 		return matches;
 	}
 
-	public void setMatches(List<RouterMatch> matches) {
+	public void setMatches(List<Map<String, String>> matches) {
 		this.matches = matches;
 	}
 
-	public List<RouterHandler> getHandlers() {
-		return handlers;
+	public List<RouterController> getControllers() {
+		return controllers;
 	}
 
-	public void setHandlers(List<RouterHandler> handlers) {
-		this.handlers = handlers;
+	public void setControllers(List<RouterController> controllers) {
+		this.controllers = controllers;
 	}
 
 	public static RouterConfig parseFromStream(Reader reader) throws IOException {

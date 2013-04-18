@@ -18,7 +18,7 @@ import com.internetitem.simpleweb.config.ServletContextConfigurationParameters;
 public class HttpDispatcherServlet extends HttpServlet {
 
 	private Router router;
-	private Map<String, RequestHandler> handlers;
+	private Map<String, ControllerBase> controllerMap;
 
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
@@ -30,19 +30,19 @@ public class HttpDispatcherServlet extends HttpServlet {
 			throw new ServletException(e);
 		}
 		router = config.getRouter();
-		handlers = config.getHandlers();
+		controllerMap = config.getControllerMap();
 	}
 
 	void handleRequest(String method, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
-			HandlerDispatcher dispatcher = router.routeRequest(method, req.getPathInfo());
-			String handlerName = dispatcher.getHandlerName();
-			RequestHandler handler = handlers.get(handlerName);
-			if (handler == null) {
-				throw new ServletException("No handler for " + handlerName);
+			ControllerDispatcher dispatcher = router.routeRequest(method, req.getPathInfo());
+			String controllerName = dispatcher.getControllerName();
+			ControllerBase controller = controllerMap.get(controllerName);
+			if (controller == null) {
+				throw new ServletException("No controller for " + controllerName);
 			}
 
-			dispatcher.dispatchRequest(handler, req, resp);
+			dispatcher.dispatchRequest(controller, req, resp);
 		} catch (HttpError e) {
 			resp.sendError(e.getCode(), e.getMessage());
 		}

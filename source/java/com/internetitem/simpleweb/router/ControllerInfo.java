@@ -6,9 +6,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.internetitem.simpleweb.config.ConfigurationException;
 
 public class ControllerInfo {
+
+	private static final Logger logger = LoggerFactory.getLogger(ControllerInfo.class);
 
 	private Pattern pattern;
 	private List<String> partNames;
@@ -91,8 +96,8 @@ public class ControllerInfo {
 			reBuilder.append(")?");
 		}
 		String finalPattern = reBuilder.toString();
-		System.err.println("pattern [" + finalPattern + "]");
-		System.err.println("parts [" + partNames + "]");
+
+		logger.debug("Adding route with pattern [" + stringPattern + "] and final pattern [" + finalPattern + "] and parts [" + partNames + "]");
 		this.pattern = Pattern.compile(finalPattern);
 	}
 

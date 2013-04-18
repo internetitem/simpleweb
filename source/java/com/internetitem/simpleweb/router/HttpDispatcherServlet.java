@@ -14,7 +14,6 @@ import com.internetitem.simpleweb.config.ConfigurationException;
 import com.internetitem.simpleweb.config.ConfigurationFactory;
 import com.internetitem.simpleweb.config.ConfigurationParameters;
 import com.internetitem.simpleweb.config.ServletContextConfigurationParameters;
-import com.internetitem.simpleweb.server.SimpleWebHandler;
 
 public class HttpDispatcherServlet extends HttpServlet {
 
@@ -35,7 +34,7 @@ public class HttpDispatcherServlet extends HttpServlet {
 	}
 
 	void handleRequest(String method, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		SimpleWebHandler.handleRequest(router, controllerMap, req, resp);
+		RequestHandler.handleRequest(router, controllerMap, req, resp);
 	}
 
 	@Override

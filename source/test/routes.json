@@ -3,6 +3,10 @@
 		{
 			name: 'test',
 			className: 'com.internetitem.simpleweb.test.TestController'
+		},
+		{
+			name: 'files',
+			className: 'com.internetitem.simpleweb.controllers.StaticFileController'
 		}
 	],
 	matches: [
@@ -12,6 +16,7 @@
 		{ pattern: '/test/*', controller: 'test', action: 'test1', which: '4' },
 		{ pattern: '/test2/:action', controller: 'test', 'invalid:action': 'test1' },
 		{ pattern: '/googleme?', redirect: 'http://www.google.com/' },
-		{ pattern: '/redirectme/:controller/:action', redirect: '/test/${controller}/${action}' }
+		{ pattern: '/redirectme/:controller/:action', redirect: '/test/${controller}/${action}' },
+		{ pattern: '/download/*', file: '/files/${path}', controller: 'files' }
 	]
 }

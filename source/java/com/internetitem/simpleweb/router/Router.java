@@ -36,7 +36,7 @@ public class Router {
 				throw new HttpError("No controller mapped for path " + path, 500);
 			}
 
-			String methodName = pieces.get("method");
+			String methodName = pieces.get("action");
 			if (methodName == null) {
 				methodName = "index";
 			}

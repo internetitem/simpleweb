@@ -18,7 +18,7 @@ import com.internetitem.simpleweb.config.ConfigurationFactory;
 public class HttpDispatcherServlet extends HttpServlet {
 
 	private Router router;
-	private Map<String, ControllerBase> controllerMap;
+	private Map<String, ControllerInstance> controllerMap;
 
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {

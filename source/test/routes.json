@@ -6,7 +6,11 @@
 		},
 		{
 			name: 'files',
-			className: 'com.internetitem.simpleweb.controllers.StaticFileController'
+			className: 'com.internetitem.simpleweb.controllers.StaticFileController',
+			params: {
+				file: '/files/${path}',
+				serveFrom: 'classpath'
+			}
 		}
 	],
 	routes: [
@@ -17,6 +21,6 @@
 		{ pattern: '/test2/:action', controller: 'test', 'invalid:action': 'test1' },
 		{ pattern: '/googleme?', redirect: 'http://www.google.com/' },
 		{ pattern: '/redirectme/:controller/:action', redirect: '/test/${controller}/${action}' },
-		{ pattern: '/download/*', file: '/files/${path}', controller: 'files', serveFrom: 'classpath' }
+		{ pattern: '/download/*', controller: 'files' }
 	]
 }

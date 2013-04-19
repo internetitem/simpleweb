@@ -12,11 +12,13 @@ import java.util.Map;
 import com.internetitem.simpleweb.config.dataModel.router.RouterConfig;
 import com.internetitem.simpleweb.config.dataModel.router.RouterController;
 import com.internetitem.simpleweb.router.ControllerBase;
+import com.internetitem.simpleweb.router.ControllerInstance;
 import com.internetitem.simpleweb.router.Router;
+import com.internetitem.simpleweb.utility.BeanUtility;
 
 public class BasicConfiguration implements Configuration {
 	private Router router;
-	private Map<String, ControllerBase> controllerMap;
+	private Map<String, ControllerInstance> controllerMap;
 	private Map<String, String> params;
 
 	private String routes;
@@ -52,7 +54,11 @@ public class BasicConfiguration implements Configuration {
 					if (controllerMap.containsKey(controllerName)) {
 						throw new IOException("Controller [" + controllerName + "] already exists");
 					}
-					controllerMap.put(controllerName, buildController(controllerName, className));
+					Map<String, String> controllerParams = controllerInfo.getParams();
+					if (controllerParams == null) {
+						controllerParams = new HashMap<>();
+					}
+					controllerMap.put(controllerName, buildController(className, params, controllerParams));
 				}
 
 				for (Map<String, String> match : config.getRoutes()) {
@@ -68,23 +74,18 @@ public class BasicConfiguration implements Configuration {
 		}
 	}
 
-	private ControllerBase buildController(String controllerName, String className) throws IOException {
-		try {
-			Class<?> clazz = Class.forName(className);
-			if (!ControllerBase.class.isAssignableFrom(clazz)) {
-				throw new IOException("Unable to create controller [" + controllerName + "] of class [" + className + "]: Not an instance of " + ControllerBase.class.getName());
-			}
-			return (ControllerBase) clazz.newInstance();
-		} catch (Exception e) {
-			throw new IOException("Unable to create controller [" + controllerName + "] of class [" + className + "]: " + e.getMessage(), e);
-		}
+	private ControllerInstance buildController(String className, Map<String, String> params, Map<String, String> controllerParams) throws Exception {
+		Map<String, String> injectParams = new HashMap<>(params);
+		injectParams.putAll(controllerParams);
+		ControllerBase controller = BeanUtility.createObject(className, ControllerBase.class, injectParams);
+		return new ControllerInstance(controllerParams, controller);
 	}
 
 	private RouterConfig loadFromReader(Reader reader) throws IOException {
 		return RouterConfig.parseFromStream(reader);
 	}
 
-	public Map<String, ControllerBase> getControllerMap() {
+	public Map<String, ControllerInstance> getControllerMap() {
 		return controllerMap;
 	}
 

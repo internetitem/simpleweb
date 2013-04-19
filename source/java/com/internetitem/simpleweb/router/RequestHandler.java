@@ -14,14 +14,19 @@ import com.internetitem.simpleweb.annotation.ControllerOptions;
 import com.internetitem.simpleweb.annotation.WebAction;
 import com.internetitem.simpleweb.router.exception.HttpError;
 import com.internetitem.simpleweb.router.exception.HttpRedirect;
+import com.internetitem.simpleweb.utility.CollectionUtility;
 
 public class RequestHandler {
-	public static void handleRequest(Router router, Map<String, ControllerBase> controllerMap, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public static void handleRequest(Router router, Map<String, ControllerInstance> controllerMap, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
 			String path = request.getPathInfo();
 			Map<String, String> params = router.routeRequest(request.getMethod(), path);
 
-			ControllerBase controller = getController(controllerMap, params, path);
+			ControllerInstance controllerInstance = getController(controllerMap, params, path);
+			ControllerBase controller = controllerInstance.getController();
+			Map<String, String> controllerParams = controllerInstance.getParams();
+			CollectionUtility.putIfAbsent(params, controllerParams);
+
 			boolean exposeAll = getExposeAll(controller);
 			String controllerName = params.get("internal:controller");
 
@@ -65,12 +70,12 @@ public class RequestHandler {
 		}
 	}
 
-	private static ControllerBase getController(Map<String, ControllerBase> controllerMap, Map<String, String> params, String path) throws ServletException {
+	private static ControllerInstance getController(Map<String, ControllerInstance> controllerMap, Map<String, String> params, String path) throws ServletException {
 		String controllerName = params.get("controller");
 		if (controllerName == null) {
 			throw new ServletException("Missing controller name mapping for path [" + path + "]");
 		}
-		ControllerBase controller = controllerMap.get(controllerName);
+		ControllerInstance controller = controllerMap.get(controllerName);
 		if (controller != null) {
 			params.put("internal:controller", controllerName);
 			return controller;

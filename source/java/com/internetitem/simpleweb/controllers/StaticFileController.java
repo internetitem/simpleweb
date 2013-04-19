@@ -1,5 +1,6 @@
 package com.internetitem.simpleweb.controllers;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -39,11 +40,23 @@ public class StaticFileController implements ControllerBase {
 		}
 		path = path.replaceAll("/\\.\\.", "");
 
-		InputStream istream = getClass().getResourceAsStream(path);
+		String serveFrom = pieces.get("serveFrom");
+		InputStream istream;
+		if (serveFrom != null && serveFrom.equals("classpath")) {
+			istream = getClass().getResourceAsStream(path);
+		} else {
+			try {
+				istream = new FileInputStream(path);
+			} catch (IOException e) {
+				throw new HttpError(e.getMessage(), 404);
+			}
+		}
+
 		if (istream == null) {
 			logger.warn("Unable to find file " + path);
 			throw new HttpError("File not Found", 404);
 		}
+
 		String contentType = getContentType(pieces, path);
 		return new StaticFileStreamer(contentType, istream);
 	}

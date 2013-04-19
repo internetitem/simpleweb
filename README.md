@@ -19,9 +19,9 @@ At this point, this project is a toy for experimenting with building a very basi
 
 There are a few ways to run this framework:
 
- * As a Web Application - Use "`HttpDispatcherServlet`" as your servlet. Any servlet init params will be used as the starting point for the Params
- * Within Jetty - Use "`SimpleWebHandler`" as your Handler. You will need to pass a `Map<String, String>` into the constructor which is the basis for the Params
- * Using the built-in embedded Jetty webserver - Run `SimpleWebServer`. The initial Params are parsed from the command line, using anything that matches the format "`key=value`".
+ * As a Web Application - Use `HttpDispatcherServlet` as your servlet. Any servlet init params will be used as the starting point for the Params
+ * Within Jetty - Use `SimpleWebHandler` as your Handler. You will need to pass a `Map<String, String>` into the constructor which is the basis for the Params
+ * Using the built-in embedded Jetty webserver - Run `SimpleWebServer`. The initial Params are parsed from the command line, using anything that matches the format `key=value`.
 
 ## Controllers ##
 
@@ -47,7 +47,7 @@ Params are built up (in order) from the following places:
 
 ## Configuration ##
 
-The framework's initial configuration is loaded from the classpath, from a file named by the Param "`config.file`", but if that isn't specified, it defaults to "`/config.json`". If this file is not found, the bootstrap configuration in "`/basic-config.json`" is used. This initial configuration specifies the `configClass` (implementing the `Configuration` interface) to use for the next phase of intialization, as well as an optional `params` map which is added to Params. The `Configuration` object can have any values from `Params` injected (by name) automatically (with conversions to Integer`/`int`, `Boolean`/`bool` if necessary). Additionally, if there is a property "`params`" with a single `Map` as its parameter (in other words a method `setParams(Map)`), the Params will be injected there.
+The framework's initial configuration is loaded from the classpath, from a file named by the Param `config.file`, but if that isn't specified, it defaults to `/config.json`. If this file is not found, the bootstrap configuration in `/basic-config.json` is used. This initial configuration specifies the `configClass` (implementing the `Configuration` interface) to use for the next phase of intialization, as well as an optional `params` map which is added to Params. The `Configuration` object can have any values from `Params` injected (by name) automatically (with conversions to `Integer`/`int`, `Boolean`/`bool` if necessary). Additionally, if there is a property `params` with a single `Map` as its parameter (in other words a method `setParams(Map)`), the Params will be injected there.
 
 ### Sample `config.json` ###
 
@@ -103,11 +103,11 @@ Additionally, the following parameters are set as part of each match:
 #### Route Syntax ####
 
  * A route contains a number of "parts", each separated by slashes
- * Each part can be a string of characters or a wildcard "`*`"
+ * Each part can be a string of characters or a wildcard `*`
  * Strings of characters:
-   * May contain a label like "`:id`"
+   * May contain a label like `:id`
    * Any text matched in the place of the `:label` will be added to the Params
-   * The part may end with a question mark ("`?`") at the end to indicate that the part is optional. Note that once an optional part is found, all parts that follow are always optional
- * The wildcard ("`*`") may only occur once in a URL and the wildcard is always optional
- * If the route ends with a slash ("`/`"), that slash may be followed by a question mark to indicate that the slash is optional
+   * The part may end with a question mark (`?`) at the end to indicate that the part is optional. Note that once an optional part is found, all parts that follow are always optional
+ * The wildcard (`*`) may only occur once in a URL and the wildcard is always optional
+ * If the route ends with a slash (`/`), that slash may be followed by a question mark to indicate that the slash is optional
 

@@ -103,11 +103,29 @@ Additionally, the following parameters are set as part of each match:
 #### Route Syntax ####
 
  * A route contains a number of "parts", each separated by slashes
- * Each part can be a string of characters or a wildcard `*`
+ * Each part can be a string of characters or a wildcard (`*`)
  * Strings of characters:
    * May contain a label like `:id`
    * Any text matched in the place of the `:label` will be added to the Params
    * The part may end with a question mark (`?`) at the end to indicate that the part is optional. Note that once an optional part is found, all parts that follow are always optional
- * The wildcard (`*`) may only occur once in a URL and the wildcard is always optional
+ * The wildcard (`*`):
+   * May only occur once in a URL
+   * The matched text is always optional
+   * Any text captured is stored in the `path` Param
  * If the route ends with a slash (`/`), that slash may be followed by a question mark to indicate that the slash is optional
+
+## Build-in Controllers ##
+
+### StaticFileController ###
+
+Serve static files from the classpath or filesystem.
+
+Configured using the following Params:
+
+ * `file` - The path to be served. This is expanded with full access to the current state of Params
+ * `path` - If `file` is missing, this is used as the file to be served instead
+ * `serveFrom` - If set to `classpath` then files are served from the classpath. Otherwise they are served from the filesystem
+ * `contentType` - If this is set, it is used as the `Content-Type` for all files served. Otherwise the content type is automatically detected using the filename
+
+
 

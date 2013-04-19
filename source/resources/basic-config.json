@@ -1,6 +1,6 @@
 {
 	configClass: 'com.internetitem.simpleweb.config.BasicConfiguration',
-	configParameters: [
-		{ key: 'configFilename', value: 'routes.json' }
-	]
+	params: {
+		configFilename: 'routes.json'
+	}
 }

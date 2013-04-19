@@ -2,13 +2,13 @@ package com.internetitem.simpleweb.config.dataModel;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.List;
+import java.util.Map;
 
 import com.internetitem.simpleweb.utility.JsonUtility;
 
 public class SimpleWebConfig {
 	private String configClass;
-	private List<KeyValuePair> configParameters;
+	private Map<String, String> params;
 
 	public String getConfigClass() {
 		return configClass;
@@ -18,12 +18,12 @@ public class SimpleWebConfig {
 		this.configClass = configClass;
 	}
 
-	public List<KeyValuePair> getConfigParameters() {
-		return configParameters;
+	public Map<String, String> getParams() {
+		return params;
 	}
 
-	public void setConfigParameters(List<KeyValuePair> configParameters) {
-		this.configParameters = configParameters;
+	public void setParams(Map<String, String> params) {
+		this.params = params;
 	}
 
 	public static SimpleWebConfig parseFromStream(Reader reader) throws IOException {

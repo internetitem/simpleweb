@@ -3,11 +3,11 @@ package com.internetitem.simpleweb.config;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.internetitem.simpleweb.config.dataModel.SimpleWebConfig;
 import com.internetitem.simpleweb.utility.BeanUtility;
-import com.internetitem.simpleweb.utility.JsonUtility;
 
 public class ConfigurationFactory {
 	public static Configuration getConfiguration(Map<String, String> params) throws ConfigurationException {
@@ -34,7 +34,10 @@ public class ConfigurationFactory {
 			Reader reader = new InputStreamReader(istream, "UTF-8");
 			SimpleWebConfig simpleWebConfig = SimpleWebConfig.parseFromStream(reader);
 			String configClassName = simpleWebConfig.getConfigClass();
-			Map<String, String> parameters = JsonUtility.toMap(simpleWebConfig.getConfigParameters());
+			Map<String, String> parameters = simpleWebConfig.getParams();
+			if (parameters == null) {
+				parameters = new HashMap<>();
+			}
 			Configuration configuration = BeanUtility.createObject(configClassName, Configuration.class, parameters);
 			configuration.init();
 			return configuration;

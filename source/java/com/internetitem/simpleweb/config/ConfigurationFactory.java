@@ -10,8 +10,8 @@ import com.internetitem.simpleweb.utility.BeanUtility;
 import com.internetitem.simpleweb.utility.JsonUtility;
 
 public class ConfigurationFactory {
-	public static Configuration getConfiguration(ConfigurationParameters params) throws ConfigurationException {
-		String configFile = params.getParameter("config.file");
+	public static Configuration getConfiguration(Map<String, String> params) throws ConfigurationException {
+		String configFile = params.get("config.file");
 		if (configFile == null) {
 			configFile = "/config.json";
 		}

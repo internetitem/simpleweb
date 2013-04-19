@@ -1,6 +1,8 @@
 package com.internetitem.simpleweb.router;
 
 import java.io.IOException;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletConfig;
@@ -12,8 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import com.internetitem.simpleweb.config.Configuration;
 import com.internetitem.simpleweb.config.ConfigurationException;
 import com.internetitem.simpleweb.config.ConfigurationFactory;
-import com.internetitem.simpleweb.config.ConfigurationParameters;
-import com.internetitem.simpleweb.config.ServletContextConfigurationParameters;
 
 public class HttpDispatcherServlet extends HttpServlet {
 
@@ -22,15 +22,26 @@ public class HttpDispatcherServlet extends HttpServlet {
 
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
-		ConfigurationParameters params = new ServletContextConfigurationParameters(servletConfig);
-		Configuration config;
+		Map<String, String> params = getParams(servletConfig);
+
 		try {
-			config = ConfigurationFactory.getConfiguration(params);
+			Configuration config = ConfigurationFactory.getConfiguration(params);
+			router = config.getRouter();
+			controllerMap = config.getControllerMap();
 		} catch (ConfigurationException e) {
 			throw new ServletException(e);
 		}
-		router = config.getRouter();
-		controllerMap = config.getControllerMap();
+	}
+
+	protected Map<String, String> getParams(ServletConfig servletConfig) {
+		Map<String, String> params = new HashMap<>();
+		Enumeration<String> paramNames = servletConfig.getInitParameterNames();
+		while (paramNames.hasMoreElements()) {
+			String paramName = paramNames.nextElement();
+			String paramValue = servletConfig.getInitParameter(paramName);
+			params.put(paramName, paramValue);
+		}
+		return params;
 	}
 
 	void handleRequest(String method, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

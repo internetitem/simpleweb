@@ -1,7 +1,6 @@
 package com.internetitem.simpleweb.server;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -14,8 +13,6 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import com.internetitem.simpleweb.config.Configuration;
 import com.internetitem.simpleweb.config.ConfigurationException;
 import com.internetitem.simpleweb.config.ConfigurationFactory;
-import com.internetitem.simpleweb.config.ConfigurationParameters;
-import com.internetitem.simpleweb.config.MapConfigurationParameters;
 import com.internetitem.simpleweb.router.ControllerBase;
 import com.internetitem.simpleweb.router.RequestHandler;
 import com.internetitem.simpleweb.router.Router;
@@ -25,8 +22,7 @@ public class SimpleWebHandler extends AbstractHandler {
 	private Router router;
 	private Map<String, ControllerBase> controllerMap;
 
-	public SimpleWebHandler() throws ConfigurationException {
-		ConfigurationParameters params = new MapConfigurationParameters(new HashMap<String, String>());
+	public SimpleWebHandler(Map<String, String> params) throws ConfigurationException {
 		Configuration config = ConfigurationFactory.getConfiguration(params);
 		router = config.getRouter();
 		controllerMap = config.getControllerMap();

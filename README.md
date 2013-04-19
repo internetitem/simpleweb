@@ -25,7 +25,7 @@ There are a few ways to run this framework:
 
 ## Controllers ##
 
-Controllers implement the `ControllerBase` interface. Actions within a Controller are regular methods. Actions must return an object implementing the `Response` interface. By default, all methods returning a `Response` object are potential actions, however this can be altered by adding the `@ControllerOptions` annotation to the Controller class, setting `exposeAll=false` and then tagging the methods to be exposed with the `@WebAction` annotation.
+Controllers implement the `ControllerBase` interface. Actions within a Controller are regular methods. Actions must return an object implementing the `Response` interface. By default, all methods returning a `Response` object are potential actions, however this can be altered by adding the `@ControllerOptions` annotation to the Controller class, setting `exposeAll=false` and then tagging the methods to be exposed with the `@WebAction` annotation. Controller can have Params injected when constructed (which is the combination of the Application's initialization parameters, the initial configuraiton's `params` element, and the Controller's `params' element).
 
 Actions may take a number of possible parameters, and the values for these parameters are automatically populated based on the parameter's type:
 
@@ -44,6 +44,7 @@ Params are built up (in order) from the following places:
  * The initial configuration's `params` element (which is a JSON map)
  * A route's attributes (every key defined as part of a route)
  * Variables matched as part of a route (:id, :name, etc...)
+ * The matched controller instance's params (this must be last since we don't necessarily know which controller to use until this point)
 
 ## Configuration ##
 
@@ -90,7 +91,11 @@ Additionally, the following parameters are set as part of each match:
         },
         {
           name: 'files',
-          className: 'com.internetitem.simpleweb.controllers.StaticFileController'
+          className: 'com.internetitem.simpleweb.controllers.StaticFileController',
+          params: {
+            file: '/files/${path}',
+            serveFrom: 'classpath'
+          }
         }
       ],
       routes: [

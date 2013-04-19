@@ -20,7 +20,7 @@ public class Router {
 		this.controllers = new ArrayList<>();
 	}
 
-	public ControllerDispatcher routeRequest(String httpMethod, String path) throws HttpError, HttpRedirect {
+	public Map<String, String> routeRequest(String httpMethod, String path) throws HttpError, HttpRedirect {
 		for (ControllerInfo controller : controllers) {
 			Matcher matcher = controller.getPattern().matcher(path);
 			if (!matcher.matches()) {
@@ -42,7 +42,7 @@ public class Router {
 				throw new HttpRedirect(newUrl);
 			}
 
-			return new ControllerDispatcher(path, pieces);
+			return pieces;
 		}
 		throw new HttpError("Not Found", 404);
 	}

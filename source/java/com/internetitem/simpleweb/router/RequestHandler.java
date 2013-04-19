@@ -19,8 +19,7 @@ public class RequestHandler {
 	public static void handleRequest(Router router, Map<String, ControllerBase> controllerMap, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
 			String path = request.getPathInfo();
-			ControllerDispatcher dispatcher = router.routeRequest(request.getMethod(), path);
-			Map<String, String> params = dispatcher.getParams();
+			Map<String, String> params = router.routeRequest(request.getMethod(), path);
 
 			ControllerBase controller = getController(controllerMap, params, path);
 			boolean exposeAll = getExposeAll(controller);
@@ -29,7 +28,7 @@ public class RequestHandler {
 			Method method = getMethod(controller, params, controllerName, path, exposeAll);
 			String methodName = params.get("internal:method");
 
-			dispatchInternal(controller, method, path, dispatcher.getParams(), controllerName, methodName, request, response);
+			dispatchInternal(controller, method, path, params, controllerName, methodName, request, response);
 		} catch (HttpError e) {
 			response.sendError(e.getCode(), e.getMessage());
 		} catch (HttpRedirect e) {

@@ -19,15 +19,15 @@ public class BasicConfiguration implements Configuration {
 	private Map<String, ControllerBase> controllerMap;
 	private Map<String, String> params;
 
-	private String configFilename;
+	private String routes;
 
 	public BasicConfiguration() {
 		this.controllerMap = new HashMap<>();
 		this.router = new Router();
 	}
 
-	public void setConfigFilename(String configFilename) {
-		this.configFilename = configFilename;
+	public void setRoutes(String routes) {
+		this.routes = routes;
 	}
 
 	public void setParams(Map<String, String> params) {
@@ -38,7 +38,7 @@ public class BasicConfiguration implements Configuration {
 	public void init() throws ConfigurationException {
 		router.setParams(params);
 		try {
-			Enumeration<URL> resources = BasicConfiguration.class.getClassLoader().getResources(configFilename);
+			Enumeration<URL> resources = BasicConfiguration.class.getClassLoader().getResources(routes);
 			while (resources.hasMoreElements()) {
 				URL url = resources.nextElement();
 				InputStream istream = url.openStream();

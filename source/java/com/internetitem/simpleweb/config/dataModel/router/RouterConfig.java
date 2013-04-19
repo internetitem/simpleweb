@@ -9,14 +9,14 @@ import com.internetitem.simpleweb.utility.JsonUtility;
 
 public class RouterConfig {
 	private List<RouterController> controllers;
-	private List<Map<String, String>> matches;
+	private List<Map<String, String>> routes;
 
-	public List<Map<String, String>> getMatches() {
-		return matches;
+	public List<Map<String, String>> getRoutes() {
+		return routes;
 	}
 
-	public void setMatches(List<Map<String, String>> matches) {
-		this.matches = matches;
+	public void setRoutes(List<Map<String, String>> routes) {
+		this.routes = routes;
 	}
 
 	public List<RouterController> getControllers() {

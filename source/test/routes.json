@@ -9,7 +9,7 @@
 			className: 'com.internetitem.simpleweb.controllers.StaticFileController'
 		}
 	],
-	matches: [
+	routes: [
 		{ pattern: '/test/?', controller: 'test', action: 'test1', which: '1' },
 		{ pattern: '/test/:foo', controller: 'test', action: 'test1', which: '2' },
 		{ pattern: '/test/which/:which', controller: 'test', action: 'test1', which: '3'},

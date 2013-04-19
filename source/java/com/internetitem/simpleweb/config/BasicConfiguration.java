@@ -55,7 +55,7 @@ public class BasicConfiguration implements Configuration {
 					controllerMap.put(controllerName, buildController(controllerName, className));
 				}
 
-				for (Map<String, String> match : config.getMatches()) {
+				for (Map<String, String> match : config.getRoutes()) {
 					String pattern = match.get("pattern");
 					if (pattern == null) {
 						throw new IOException("Found match with no pattern");

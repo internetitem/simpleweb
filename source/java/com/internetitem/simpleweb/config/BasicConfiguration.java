@@ -17,6 +17,7 @@ import com.internetitem.simpleweb.router.Router;
 public class BasicConfiguration implements Configuration {
 	private Router router;
 	private Map<String, ControllerBase> controllerMap;
+	private Map<String, String> params;
 
 	private String configFilename;
 
@@ -29,8 +30,13 @@ public class BasicConfiguration implements Configuration {
 		this.configFilename = configFilename;
 	}
 
+	public void setParams(Map<String, String> params) {
+		this.params = params;
+	}
+
 	@Override
 	public void init() throws ConfigurationException {
+		router.setParams(params);
 		try {
 			Enumeration<URL> resources = BasicConfiguration.class.getClassLoader().getResources(configFilename);
 			while (resources.hasMoreElements()) {

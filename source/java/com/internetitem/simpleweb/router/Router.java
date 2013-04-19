@@ -13,6 +13,7 @@ import com.internetitem.simpleweb.utility.StringUtility;
 
 public class Router {
 
+	private Map<String, String> params;
 	private List<ControllerInfo> controllers;
 
 	public Router() {
@@ -26,7 +27,8 @@ public class Router {
 				continue;
 			}
 
-			Map<String, String> pieces = new HashMap<>(controller.getParams());
+			Map<String, String> pieces = new HashMap<>(params);
+			pieces.putAll(controller.getParams());
 			int groupNum = 1;
 			for (String partName : controller.getPartNames()) {
 				String value = matcher.group(groupNum);
@@ -47,6 +49,13 @@ public class Router {
 
 	public void addRoute(String pattern, Map<String, String> params) throws ConfigurationException {
 		controllers.add(new ControllerInfo(pattern, params));
+	}
+
+	public void setParams(Map<String, String> params) {
+		if (params == null) {
+			params = new HashMap<>();
+		}
+		this.params = params;
 	}
 
 }

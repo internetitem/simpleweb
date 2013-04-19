@@ -3,6 +3,7 @@ package com.internetitem.simpleweb.config;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.internetitem.simpleweb.config.dataModel.SimpleWebConfig;
@@ -28,16 +29,20 @@ public class ConfigurationFactory {
 		return loadConfig(configFile, istream, params);
 	}
 
-	private static Configuration loadConfig(String configFile, InputStream istream, Map<String, String> params) throws ConfigurationException {
+	private static Configuration loadConfig(String configFile, InputStream istream, Map<String, String> initParams) throws ConfigurationException {
 		try {
 			Reader reader = new InputStreamReader(istream, "UTF-8");
 			SimpleWebConfig simpleWebConfig = SimpleWebConfig.parseFromStream(reader);
 			String configClassName = simpleWebConfig.getConfigClass();
-			Map<String, String> newParams = simpleWebConfig.getParams();
-			if (newParams != null) {
-				params.putAll(newParams);
+			Map<String, String> configParams = simpleWebConfig.getParams();
+			Map<String, Object> allParams = new HashMap<>();
+			allParams.putAll(initParams);
+			if (configParams != null) {
+				allParams.putAll(configParams);
 			}
-			Configuration configuration = BeanUtility.createObject(configClassName, Configuration.class, params);
+			Map<String, Object> injectParams = new HashMap<>(allParams);
+			injectParams.put("params", allParams);
+			Configuration configuration = BeanUtility.createObject(configClassName, Configuration.class, injectParams);
 			configuration.init();
 			return configuration;
 		} catch (Exception e) {

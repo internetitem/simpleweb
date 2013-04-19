@@ -79,7 +79,7 @@ public class BeanUtility {
 		}
 	}
 
-	public static <T> T createObject(String className, Class<T> clazz, Map<String, String> parameters) throws Exception {
+	public static <T> T createObject(String className, Class<T> clazz, Map<String, ? extends Object> parameters) throws Exception {
 		Class<?> objClass = Class.forName(className);
 		if (!clazz.isAssignableFrom(objClass)) {
 			throw new Exception("Class " + className + " is not a " + clazz.getName());

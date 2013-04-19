@@ -14,7 +14,7 @@ public class SimpleWebServer {
 	public static void main(String[] args) throws Exception {
 		Server server = new Server(8080);
 
-		Map<String, String> params = new HashMap<>();
+		Map<String, String> params = parseCommandLine(args);
 		server.setHandler(new SimpleWebHandler(params));
 
 		server.setStopTimeout(1000);
@@ -27,6 +27,22 @@ public class SimpleWebServer {
 			logger.error("Failed to start server: " + e.getMessage(), e);
 			server.stop();
 		}
+	}
+
+	private static Map<String, String> parseCommandLine(String[] args) {
+		Map<String, String> params = new HashMap<>();
+
+		for (String arg : args) {
+			String parts[] = arg.split("=", 2);
+			if (parts.length != 2) {
+				continue;
+			}
+			String key = parts[0];
+			String value = parts[1];
+			params.put(key, value);
+		}
+
+		return params;
 	}
 
 }

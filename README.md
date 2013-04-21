@@ -42,9 +42,9 @@ Params are built up (in order) from the following places:
 
  * Application initialization (as described above)
  * The initial configuration's `params` element (which is a JSON map)
+ * The matched controller instance's params
  * A route's attributes (every key defined as part of a route)
  * Variables matched as part of a route (:id, :name, etc...)
- * The matched controller instance's params (this must be last since we don't necessarily know which controller to use until this point)
 
 ## Configuration ##
 
@@ -76,10 +76,7 @@ The following Params have special meanings to the routing process, and are used 
  * `invalid:action` - A "backup" method that will be used if the original `action` is not found
  * `redirect` - If set, an HTTP Redirect is sent to the client. Note that this parameter uses expansion and has access to the current state of Params
 
-Additionally, the following parameters are set as part of each match:
-
- * `internal:controller` - The actual controller being used
- * `internal:method` - The actual method being used
+Note that the Params listed above must be defined within the route itself and aren't inherited as part of the usual Params process (although they will be available in the final Params passed to the controller's action method).
 
 #### Sample `routes.json` #####
 

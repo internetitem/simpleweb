@@ -13,20 +13,17 @@ import com.internetitem.simpleweb.config.dataModel.router.RouterConfig;
 import com.internetitem.simpleweb.config.dataModel.router.RouterController;
 import com.internetitem.simpleweb.router.ControllerBase;
 import com.internetitem.simpleweb.router.ControllerInstance;
+import com.internetitem.simpleweb.router.Dispatcher;
 import com.internetitem.simpleweb.router.Router;
 import com.internetitem.simpleweb.utility.BeanUtility;
 import com.internetitem.simpleweb.utility.Params;
 
 public class BasicConfiguration implements Configuration {
-	private Router router;
-	private Map<String, ControllerInstance> controllerMap;
-	private Params params;
 
+	private Params params;
 	private String routes;
 
 	public BasicConfiguration() {
-		this.controllerMap = new HashMap<>();
-		this.router = new Router();
 	}
 
 	public void setRoutes(String routes) {
@@ -34,8 +31,14 @@ public class BasicConfiguration implements Configuration {
 	}
 
 	@Override
-	public void init(Params params) throws ConfigurationException {
+	public void init(Params params) {
 		this.params = params;
+	}
+
+	@Override
+	public Dispatcher getDispatcher() throws ConfigurationException {
+		Map<String, ControllerInstance> controllerMap = new HashMap<>();
+		Router router = new Router();
 		try {
 			Enumeration<URL> resources = BasicConfiguration.class.getClassLoader().getResources(routes);
 			while (resources.hasMoreElements()) {
@@ -67,6 +70,7 @@ public class BasicConfiguration implements Configuration {
 		} catch (Exception e) {
 			throw new ConfigurationException("Error initializing BasicConfiguration: " + e.getMessage(), e);
 		}
+		return new Dispatcher(params, router, controllerMap);
 	}
 
 	private ControllerInstance buildController(String className, Map<String, String> controllerParams, Params params) throws Exception {
@@ -78,18 +82,4 @@ public class BasicConfiguration implements Configuration {
 		return RouterConfig.parseFromStream(reader);
 	}
 
-	@Override
-	public Map<String, ControllerInstance> getControllerMap() {
-		return controllerMap;
-	}
-
-	@Override
-	public Router getRouter() {
-		return router;
-	}
-
-	@Override
-	public Params getParams() {
-		return params;
-	}
 }

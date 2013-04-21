@@ -2,7 +2,6 @@ package com.internetitem.simpleweb.router;
 
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.Map;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -17,9 +16,7 @@ import com.internetitem.simpleweb.utility.Params;
 
 public class HttpDispatcherServlet extends HttpServlet {
 
-	private Router router;
-	private Map<String, ControllerInstance> controllerMap;
-	private Params params;
+	private Dispatcher dispatcher;
 
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
@@ -27,9 +24,7 @@ public class HttpDispatcherServlet extends HttpServlet {
 
 		try {
 			Configuration config = ConfigurationFactory.getConfiguration(params);
-			router = config.getRouter();
-			controllerMap = config.getControllerMap();
-			this.params = params;
+			dispatcher = config.getDispatcher();
 		} catch (ConfigurationException e) {
 			throw new ServletException(e);
 		}
@@ -47,7 +42,7 @@ public class HttpDispatcherServlet extends HttpServlet {
 	}
 
 	void handleRequest(String method, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		RequestHandler.handleRequest(params, router, controllerMap, req, resp);
+		dispatcher.handleRequest(req, resp);
 	}
 
 	@Override

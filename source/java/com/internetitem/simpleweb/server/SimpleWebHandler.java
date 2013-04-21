@@ -1,7 +1,6 @@
 package com.internetitem.simpleweb.server;
 
 import java.io.IOException;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -13,27 +12,21 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import com.internetitem.simpleweb.config.Configuration;
 import com.internetitem.simpleweb.config.ConfigurationException;
 import com.internetitem.simpleweb.config.ConfigurationFactory;
-import com.internetitem.simpleweb.router.ControllerInstance;
-import com.internetitem.simpleweb.router.RequestHandler;
-import com.internetitem.simpleweb.router.Router;
+import com.internetitem.simpleweb.router.Dispatcher;
 import com.internetitem.simpleweb.utility.Params;
 
 public class SimpleWebHandler extends AbstractHandler {
 
-	private Router router;
-	private Map<String, ControllerInstance> controllerMap;
-	private Params params;
+	private Dispatcher dispatcher;
 
 	public SimpleWebHandler(Params params) throws ConfigurationException {
 		Configuration config = ConfigurationFactory.getConfiguration(params);
-		router = config.getRouter();
-		controllerMap = config.getControllerMap();
-		this.params = config.getParams();
+		this.dispatcher = config.getDispatcher();
 	}
 
 	@Override
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		RequestHandler.handleRequest(params, router, controllerMap, request, response);
+		dispatcher.handleRequest(request, response);
 		baseRequest.setHandled(true);
 	}
 

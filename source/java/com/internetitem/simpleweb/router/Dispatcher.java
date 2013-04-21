@@ -16,8 +16,18 @@ import com.internetitem.simpleweb.controllers.RedirectController;
 import com.internetitem.simpleweb.router.exception.HttpError;
 import com.internetitem.simpleweb.utility.Params;
 
-public class RequestHandler {
-	public static void handleRequest(Params params, Router router, Map<String, ControllerInstance> controllerMap, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+public class Dispatcher {
+	private Params params;
+	private Router router;
+	private Map<String, ControllerInstance> controllerMap;
+
+	public Dispatcher(Params params, Router router, Map<String, ControllerInstance> controllerMap) {
+		this.params = params;
+		this.router = router;
+		this.controllerMap = controllerMap;
+	}
+
+	public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
 			String path = request.getPathInfo();
 			Map<String, String> matchParams = router.routeRequest(request.getMethod(), path);
@@ -26,7 +36,7 @@ public class RequestHandler {
 			dispatchInfo.setRequest(request);
 			dispatchInfo.setResponse(response);
 			dispatchInfo.setPath(path);
-			findController(dispatchInfo, controllerMap, params, matchParams);
+			findController(dispatchInfo, matchParams);
 			findMethod(dispatchInfo);
 			dispatchInternal(dispatchInfo);
 		} catch (HttpError e) {
@@ -34,7 +44,7 @@ public class RequestHandler {
 		}
 	}
 
-	private static boolean getExposeAll(DispatchInfo dispatchInfo) {
+	private boolean getExposeAll(DispatchInfo dispatchInfo) {
 		ControllerBase controller = dispatchInfo.getController();
 		ControllerOptions options = controller.getClass().getAnnotation(ControllerOptions.class);
 		if (options == null) {
@@ -43,7 +53,7 @@ public class RequestHandler {
 		return options.exposeAll();
 	}
 
-	private static void findMethod(DispatchInfo dispatchInfo) throws ServletException {
+	private void findMethod(DispatchInfo dispatchInfo) throws ServletException {
 		boolean exposeAll = getExposeAll(dispatchInfo);
 		Params params = dispatchInfo.getParams();
 
@@ -70,14 +80,14 @@ public class RequestHandler {
 		}
 	}
 
-	private static void findController(DispatchInfo dispatchInfo, Map<String, ControllerInstance> controllerMap, Params oldParams, Map<String, String> matchParams) throws ServletException {
+	private void findController(DispatchInfo dispatchInfo, Map<String, String> matchParams) throws ServletException {
 		String redirect = matchParams.get("redirect");
 		Params newParams;
 		if (redirect != null) {
 			dispatchInfo.setController(RedirectController.INSTANCE);
 			dispatchInfo.setControllerName("<redirect>");
 			dispatchInfo.setMethodName("index");
-			newParams = oldParams;
+			newParams = params;
 		} else {
 			String controllerName = matchParams.get("controller");
 			if (controllerName == null) {
@@ -87,7 +97,7 @@ public class RequestHandler {
 			if (controller != null) {
 				dispatchInfo.setControllerName(controllerName);
 				dispatchInfo.setController(controller.getController());
-				newParams = oldParams.addParams(controller.getControllerParams());
+				newParams = params.addParams(controller.getControllerParams());
 			} else {
 				String invalidControllerName = matchParams.get("invalid:controller");
 				if (invalidControllerName == null) {
@@ -99,14 +109,14 @@ public class RequestHandler {
 				}
 				dispatchInfo.setControllerName(invalidControllerName);
 				dispatchInfo.setController(controller.getController());
-				newParams = oldParams.addParams(controller.getControllerParams());
+				newParams = params.addParams(controller.getControllerParams());
 			}
 		}
 		Params finalParams = newParams.addParams(matchParams);
 		dispatchInfo.setParams(finalParams);
 	}
 
-	private static void dispatchInternal(DispatchInfo dispatchInfo) throws HttpError, ServletException, IOException {
+	private void dispatchInternal(DispatchInfo dispatchInfo) throws HttpError, ServletException, IOException {
 		ControllerBase controller = dispatchInfo.getController();
 		Method method = dispatchInfo.getMethod();
 
@@ -162,7 +172,7 @@ public class RequestHandler {
 		}
 	}
 
-	private static Method findJavaMethod(ControllerBase controller, String methodName, boolean exposeAll) {
+	private Method findJavaMethod(ControllerBase controller, String methodName, boolean exposeAll) {
 		Class<? extends ControllerBase> controllerClass = controller.getClass();
 		for (Method method : controllerClass.getMethods()) {
 			if (!method.getName().equals(methodName)) {
@@ -182,11 +192,12 @@ public class RequestHandler {
 		return null;
 	}
 
-	private static boolean isMethodExposed(Method method, boolean exposeAll) {
+	private boolean isMethodExposed(Method method, boolean exposeAll) {
 		if (exposeAll) {
 			return true;
 		}
 		WebAction webMethod = method.getAnnotation(WebAction.class);
 		return (webMethod != null);
 	}
+
 }

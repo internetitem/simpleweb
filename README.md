@@ -90,8 +90,7 @@ Note that the Params listed above must be defined within the route itself and ar
           name: 'files',
           className: 'com.internetitem.simpleweb.controllers.StaticFileController',
           params: {
-            file: '/files/${path}',
-            serveFrom: 'classpath'
+            file: '/files/${path}'
           }
         }
       ],
@@ -126,7 +125,6 @@ Configured using the following Params:
 
  * `file` - The path to be served. This is expanded with full access to the current state of Params
  * `path` - If `file` is missing, this is used as the file to be served instead
- * `serveFrom` - If set to `classpath` then files are served from the classpath. Otherwise they are served from the filesystem
  * `contentType` - If this is set, it is used as the `Content-Type` for all files served. Otherwise the content type is automatically detected using the filename
 
 

@@ -12,10 +12,10 @@ import java.util.Map;
 import com.internetitem.simpleweb.config.dataModel.router.RouterConfig;
 import com.internetitem.simpleweb.config.dataModel.router.RouterController;
 import com.internetitem.simpleweb.router.BasicDispatcher;
+import com.internetitem.simpleweb.router.BasicRouter;
 import com.internetitem.simpleweb.router.ControllerBase;
 import com.internetitem.simpleweb.router.ControllerInstance;
 import com.internetitem.simpleweb.router.Dispatcher;
-import com.internetitem.simpleweb.router.Router;
 import com.internetitem.simpleweb.utility.BeanUtility;
 import com.internetitem.simpleweb.utility.Params;
 
@@ -36,10 +36,14 @@ public class BasicConfiguration implements Configuration {
 		this.params = params;
 	}
 
+	protected BasicRouter buildRouter() {
+		return new BasicRouter();
+	}
+
 	@Override
 	public Dispatcher getDispatcher() throws ConfigurationException {
 		Map<String, ControllerInstance> controllerMap = new HashMap<>();
-		Router router = new Router();
+		BasicRouter router = buildRouter();
 		try {
 			Enumeration<URL> resources = BasicConfiguration.class.getClassLoader().getResources(routes);
 			while (resources.hasMoreElements()) {

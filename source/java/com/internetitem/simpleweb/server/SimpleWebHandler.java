@@ -16,13 +16,14 @@ import com.internetitem.simpleweb.config.ConfigurationFactory;
 import com.internetitem.simpleweb.router.ControllerInstance;
 import com.internetitem.simpleweb.router.RequestHandler;
 import com.internetitem.simpleweb.router.Router;
+import com.internetitem.simpleweb.utility.Params;
 
 public class SimpleWebHandler extends AbstractHandler {
 
 	private Router router;
 	private Map<String, ControllerInstance> controllerMap;
 
-	public SimpleWebHandler(Map<String, String> params) throws ConfigurationException {
+	public SimpleWebHandler(Params params) throws ConfigurationException {
 		Configuration config = ConfigurationFactory.getConfiguration(params);
 		router = config.getRouter();
 		controllerMap = config.getControllerMap();

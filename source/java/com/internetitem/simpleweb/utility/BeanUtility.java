@@ -4,10 +4,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
-import com.internetitem.simpleweb.utility.converter.ObjectConverter;
+import com.internetitem.simpleweb.utility.converter.StringConverter;
 import com.internetitem.simpleweb.utility.converter.StringToBoolean;
 import com.internetitem.simpleweb.utility.converter.StringToInteger;
 import com.internetitem.simpleweb.utility.converter.StringToPrimitiveBoolean;
@@ -15,21 +13,20 @@ import com.internetitem.simpleweb.utility.converter.StringToPrimitiveInt;
 
 public class BeanUtility {
 
-	public static final List<ObjectConverter<?, ?>> STANDARD_STRING_CONVERTERS = new ArrayList<>();
+	public static final List<StringConverter<?>> STANDARD_CONVERTERS = new ArrayList<>();
 	static {
-		STANDARD_STRING_CONVERTERS.add(new StringToBoolean());
-		STANDARD_STRING_CONVERTERS.add(new StringToInteger());
-		STANDARD_STRING_CONVERTERS.add(new StringToPrimitiveBoolean());
-		STANDARD_STRING_CONVERTERS.add(new StringToPrimitiveInt());
+		STANDARD_CONVERTERS.add(new StringToBoolean());
+		STANDARD_CONVERTERS.add(new StringToInteger());
+		STANDARD_CONVERTERS.add(new StringToPrimitiveBoolean());
+		STANDARD_CONVERTERS.add(new StringToPrimitiveInt());
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static void injectParameters(Object obj, Map<String, ? extends Object> map, List<? extends ObjectConverter> converters) {
+	@SuppressWarnings({ "rawtypes" })
+	public static void injectParameters(Object obj, Params params, List<? extends StringConverter> converters) {
 		Class<?> clazz = obj.getClass();
 		Method[] methods = clazz.getMethods();
-		for (Entry<String, ? extends Object> entry : map.entrySet()) {
-			String name = entry.getKey();
-			Object rawValue = entry.getValue();
+		for (String name : params.getParamNames()) {
+			String rawValue = params.getValue(name);
 			String setterName = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
 
 			for (Method method : methods) {
@@ -41,14 +38,10 @@ public class BeanUtility {
 
 					Class<?> parameterType = parameterTypes[0];
 					Object value = null;
-					if (parameterType.isInstance(rawValue)) {
+					if (parameterType.isAssignableFrom(String.class)) {
 						value = rawValue;
 					} else {
-						for (ObjectConverter converter : converters) {
-							Class<?> sourceClass = converter.getSourceClass();
-							if (!sourceClass.isInstance(rawValue)) {
-								continue;
-							}
+						for (StringConverter converter : converters) {
 							Class<?> resultClass = converter.getResultClass();
 							if (!resultClass.isAssignableFrom(parameterType)) {
 								continue;
@@ -62,7 +55,7 @@ public class BeanUtility {
 							}
 						}
 						if (value == null) {
-							throw new RuntimeException("Unable to convert " + rawValue.getClass().getName() + " to " + parameterType.getName() + " for method " + setterName + " of type " + clazz.getName());
+							throw new RuntimeException("Unable to convert String to " + parameterType.getName() + " for method " + setterName + " of type " + clazz.getName());
 						}
 					}
 
@@ -79,13 +72,13 @@ public class BeanUtility {
 		}
 	}
 
-	public static <T> T createObject(String className, Class<T> clazz, Map<String, ? extends Object> parameters) throws Exception {
+	public static <T> T createObject(String className, Class<T> clazz, Params params) throws Exception {
 		Class<?> objClass = Class.forName(className);
 		if (!clazz.isAssignableFrom(objClass)) {
 			throw new Exception("Class " + className + " is not a " + clazz.getName());
 		}
 		Object obj = objClass.newInstance();
-		injectParameters(obj, parameters, STANDARD_STRING_CONVERTERS);
+		injectParameters(obj, params, STANDARD_CONVERTERS);
 		T newObj = clazz.cast(obj);
 		return newObj;
 	}

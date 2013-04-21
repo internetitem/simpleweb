@@ -3,15 +3,15 @@ package com.internetitem.simpleweb.config;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.HashMap;
 import java.util.Map;
 
 import com.internetitem.simpleweb.config.dataModel.SimpleWebConfig;
 import com.internetitem.simpleweb.utility.BeanUtility;
+import com.internetitem.simpleweb.utility.Params;
 
 public class ConfigurationFactory {
-	public static Configuration getConfiguration(Map<String, String> params) throws ConfigurationException {
-		String configFile = params.get("config.file");
+	public static Configuration getConfiguration(Params params) throws ConfigurationException {
+		String configFile = params.getValue("config.file");
 		if (configFile == null) {
 			configFile = "/config.json";
 		}
@@ -29,21 +29,15 @@ public class ConfigurationFactory {
 		return loadConfig(configFile, istream, params);
 	}
 
-	private static Configuration loadConfig(String configFile, InputStream istream, Map<String, String> initParams) throws ConfigurationException {
+	private static Configuration loadConfig(String configFile, InputStream istream, Params initParams) throws ConfigurationException {
 		try {
 			Reader reader = new InputStreamReader(istream, "UTF-8");
 			SimpleWebConfig simpleWebConfig = SimpleWebConfig.parseFromStream(reader);
 			String configClassName = simpleWebConfig.getConfigClass();
 			Map<String, String> configParams = simpleWebConfig.getParams();
-			Map<String, Object> allParams = new HashMap<>();
-			allParams.putAll(initParams);
-			if (configParams != null) {
-				allParams.putAll(configParams);
-			}
-			Map<String, Object> injectParams = new HashMap<>(allParams);
-			injectParams.put("params", allParams);
-			Configuration configuration = BeanUtility.createObject(configClassName, Configuration.class, injectParams);
-			configuration.init();
+			Params newParams = initParams.addParams(configParams);
+			Configuration configuration = BeanUtility.createObject(configClassName, Configuration.class, newParams);
+			configuration.init(newParams);
 			return configuration;
 		} catch (Exception e) {
 			throw new ConfigurationException("Error loading configuration from " + configFile + ": " + e.getMessage(), e);

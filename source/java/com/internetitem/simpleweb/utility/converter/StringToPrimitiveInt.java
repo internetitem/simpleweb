@@ -1,11 +1,6 @@
 package com.internetitem.simpleweb.utility.converter;
 
-public class StringToPrimitiveInt implements ObjectConverter<String, Integer> {
-
-	@Override
-	public Class<String> getSourceClass() {
-		return String.class;
-	}
+public class StringToPrimitiveInt implements StringConverter<Integer> {
 
 	@Override
 	public Class<Integer> getResultClass() {
@@ -13,8 +8,8 @@ public class StringToPrimitiveInt implements ObjectConverter<String, Integer> {
 	}
 
 	@Override
-	public Integer convertObject(String obj) throws Exception {
-		return Integer.valueOf(obj);
+	public Integer convertObject(String value) throws Exception {
+		return Integer.valueOf(value);
 	}
 
 }

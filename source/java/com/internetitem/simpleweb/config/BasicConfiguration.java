@@ -15,11 +15,11 @@ import com.internetitem.simpleweb.router.ControllerBase;
 import com.internetitem.simpleweb.router.ControllerInstance;
 import com.internetitem.simpleweb.router.Router;
 import com.internetitem.simpleweb.utility.BeanUtility;
+import com.internetitem.simpleweb.utility.Params;
 
 public class BasicConfiguration implements Configuration {
 	private Router router;
 	private Map<String, ControllerInstance> controllerMap;
-	private Map<String, String> params;
 
 	private String routes;
 
@@ -32,12 +32,8 @@ public class BasicConfiguration implements Configuration {
 		this.routes = routes;
 	}
 
-	public void setParams(Map<String, String> params) {
-		this.params = params;
-	}
-
 	@Override
-	public void init() throws ConfigurationException {
+	public void init(Params params) throws ConfigurationException {
 		router.setParams(params);
 		try {
 			Enumeration<URL> resources = BasicConfiguration.class.getClassLoader().getResources(routes);
@@ -55,10 +51,8 @@ public class BasicConfiguration implements Configuration {
 						throw new IOException("Controller [" + controllerName + "] already exists");
 					}
 					Map<String, String> controllerParams = controllerInfo.getParams();
-					if (controllerParams == null) {
-						controllerParams = new HashMap<>();
-					}
-					controllerMap.put(controllerName, buildController(className, params, controllerParams));
+					Params newParams = params.addParams(controllerParams);
+					controllerMap.put(controllerName, buildController(className, controllerParams, newParams));
 				}
 
 				for (Map<String, String> match : config.getRoutes()) {
@@ -74,10 +68,8 @@ public class BasicConfiguration implements Configuration {
 		}
 	}
 
-	private ControllerInstance buildController(String className, Map<String, String> params, Map<String, String> controllerParams) throws Exception {
-		Map<String, String> injectParams = new HashMap<>(params);
-		injectParams.putAll(controllerParams);
-		ControllerBase controller = BeanUtility.createObject(className, ControllerBase.class, injectParams);
+	private ControllerInstance buildController(String className, Map<String, String> controllerParams, Params params) throws Exception {
+		ControllerBase controller = BeanUtility.createObject(className, ControllerBase.class, params);
 		return new ControllerInstance(controllerParams, controller);
 	}
 

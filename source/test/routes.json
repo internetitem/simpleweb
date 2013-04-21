@@ -2,7 +2,11 @@
 	controllers: [
 		{
 			name: 'test',
-			className: 'com.internetitem.simpleweb.test.TestController'
+			className: 'com.internetitem.simpleweb.test.TestController',
+			params: {
+				which: 'override',
+				controllerParam: 'something'
+			}
 		},
 		{
 			name: 'files',

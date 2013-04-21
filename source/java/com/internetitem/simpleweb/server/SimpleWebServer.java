@@ -1,11 +1,10 @@
 package com.internetitem.simpleweb.server;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.jetty.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.internetitem.simpleweb.utility.Params;
 
 public class SimpleWebServer {
 
@@ -14,7 +13,7 @@ public class SimpleWebServer {
 	public static void main(String[] args) throws Exception {
 		Server server = new Server(8080);
 
-		Map<String, String> params = parseCommandLine(args);
+		Params params = parseCommandLine(args);
 		server.setHandler(new SimpleWebHandler(params));
 
 		server.setStopTimeout(1000);
@@ -29,8 +28,8 @@ public class SimpleWebServer {
 		}
 	}
 
-	private static Map<String, String> parseCommandLine(String[] args) {
-		Map<String, String> params = new HashMap<>();
+	private static Params parseCommandLine(String[] args) {
+		Params params = new Params();
 
 		for (String arg : args) {
 			String parts[] = arg.split("=", 2);
@@ -39,7 +38,7 @@ public class SimpleWebServer {
 			}
 			String key = parts[0];
 			String value = parts[1];
-			params.put(key, value);
+			params.setValue(key, value);
 		}
 
 		return params;

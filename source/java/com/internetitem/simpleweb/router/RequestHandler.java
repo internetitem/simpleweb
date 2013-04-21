@@ -14,26 +14,26 @@ import com.internetitem.simpleweb.annotation.ControllerOptions;
 import com.internetitem.simpleweb.annotation.WebAction;
 import com.internetitem.simpleweb.router.exception.HttpError;
 import com.internetitem.simpleweb.router.exception.HttpRedirect;
-import com.internetitem.simpleweb.utility.CollectionUtility;
+import com.internetitem.simpleweb.utility.Params;
 
 public class RequestHandler {
 	public static void handleRequest(Router router, Map<String, ControllerInstance> controllerMap, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
 			String path = request.getPathInfo();
-			Map<String, String> params = router.routeRequest(request.getMethod(), path);
+			Params oldParams = router.routeRequest(request.getMethod(), path);
 
-			ControllerInstance controllerInstance = getController(controllerMap, params, path);
+			ControllerInstance controllerInstance = getController(controllerMap, oldParams, path);
 			ControllerBase controller = controllerInstance.getController();
-			Map<String, String> controllerParams = controllerInstance.getParams();
-			CollectionUtility.putIfAbsent(params, controllerParams);
+			Map<String, String> controllerParams = controllerInstance.getControllerParams();
+			Params newParams = oldParams.addMissingParams(controllerParams);
 
 			boolean exposeAll = getExposeAll(controller);
-			String controllerName = params.get("internal:controller");
+			String controllerName = newParams.getValue("internal:controller");
 
-			Method method = getMethod(controller, params, controllerName, path, exposeAll);
-			String methodName = params.get("internal:method");
+			Method method = getMethod(controller, newParams, controllerName, path, exposeAll);
+			String methodName = newParams.getValue("internal:method");
 
-			dispatchInternal(controller, method, path, params, controllerName, methodName, request, response);
+			dispatchInternal(controller, method, path, newParams, controllerName, methodName, request, response);
 		} catch (HttpError e) {
 			response.sendError(e.getCode(), e.getMessage());
 		} catch (HttpRedirect e) {
@@ -49,38 +49,38 @@ public class RequestHandler {
 		return options.exposeAll();
 	}
 
-	private static Method getMethod(ControllerBase controller, Map<String, String> params, String controllerName, String path, boolean exposeAll) throws ServletException {
-		String methodName = params.get("action");
+	private static Method getMethod(ControllerBase controller, Params params, String controllerName, String path, boolean exposeAll) throws ServletException {
+		String methodName = params.getValue("action");
 		if (methodName == null) {
 			methodName = "index";
 		}
 		Method method = findMethod(controller, methodName, exposeAll);
 
 		if (method != null) {
-			params.put("internal:method", methodName);
+			params.setValue("internal:method", methodName);
 			return method;
 		} else {
-			String invalidMethodName = params.get("invalid:action");
+			String invalidMethodName = params.getValue("invalid:action");
 			method = findMethod(controller, invalidMethodName, exposeAll);
 			if (method == null) {
 				throw new ServletException("Unable to find action [" + methodName + "] in controller [" + controllerName + "]");
 			}
-			params.put("internal:method", invalidMethodName);
+			params.setValue("internal:method", invalidMethodName);
 			return method;
 		}
 	}
 
-	private static ControllerInstance getController(Map<String, ControllerInstance> controllerMap, Map<String, String> params, String path) throws ServletException {
-		String controllerName = params.get("controller");
+	private static ControllerInstance getController(Map<String, ControllerInstance> controllerMap, Params params, String path) throws ServletException {
+		String controllerName = params.getValue("controller");
 		if (controllerName == null) {
 			throw new ServletException("Missing controller name mapping for path [" + path + "]");
 		}
 		ControllerInstance controller = controllerMap.get(controllerName);
 		if (controller != null) {
-			params.put("internal:controller", controllerName);
+			params.setValue("internal:controller", controllerName);
 			return controller;
 		} else {
-			String invalidControllerName = params.get("invalid:controller");
+			String invalidControllerName = params.getValue("invalid:controller");
 			if (invalidControllerName == null) {
 				throw new ServletException("Could not find controller [" + controllerName + "] for [" + path + "]");
 			}
@@ -88,12 +88,12 @@ public class RequestHandler {
 			if (controller == null) {
 				throw new ServletException("No controller for " + controllerName);
 			}
-			params.put("internal:controller", invalidControllerName);
+			params.setValue("internal:controller", invalidControllerName);
 			return controller;
 		}
 	}
 
-	private static void dispatchInternal(ControllerBase controller, Method method, String path, Map<String, String> params, String controllerName, String methodName, HttpServletRequest req, HttpServletResponse resp) throws HttpError, ServletException, IOException {
+	private static void dispatchInternal(ControllerBase controller, Method method, String path, Params params, String controllerName, String methodName, HttpServletRequest req, HttpServletResponse resp) throws HttpError, ServletException, IOException {
 		Class<?>[] parameterTypes = method.getParameterTypes();
 		int numParameters = parameterTypes.length;
 		Object[] parameterValues = new Object[numParameters];
@@ -105,7 +105,7 @@ public class RequestHandler {
 				parameterValues[i] = resp;
 			} else if (paramType.isAssignableFrom(String.class)) {
 				parameterValues[i] = path;
-			} else if (paramType.isAssignableFrom(Map.class)) {
+			} else if (paramType.isAssignableFrom(Params.class)) {
 				parameterValues[i] = params;
 			} else {
 				throw new ServletException("Unknown type " + paramType.getName() + " for method " + methodName + " in controller " + controllerName);

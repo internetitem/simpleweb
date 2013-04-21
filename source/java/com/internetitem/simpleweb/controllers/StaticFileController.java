@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLConnection;
 import java.util.Collection;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 
@@ -19,7 +18,7 @@ import com.internetitem.simpleweb.router.ControllerBase;
 import com.internetitem.simpleweb.router.Response;
 import com.internetitem.simpleweb.router.ResponseHeader;
 import com.internetitem.simpleweb.router.exception.HttpError;
-import com.internetitem.simpleweb.utility.StringUtility;
+import com.internetitem.simpleweb.utility.Params;
 
 @ControllerOptions(exposeAll = false)
 public class StaticFileController implements ControllerBase {
@@ -27,20 +26,20 @@ public class StaticFileController implements ControllerBase {
 	private static final Logger logger = LoggerFactory.getLogger(StaticFileController.class);
 
 	@WebAction
-	public StaticFileStreamer index(Map<String, String> pieces) throws HttpError, ServletException {
-		String filename = pieces.get("file");
+	public StaticFileStreamer index(Params params) throws HttpError, ServletException {
+		String filename = params.getEvaluatedValue("file");
 		String path;
 		if (filename != null) {
-			path = StringUtility.expandText(filename, pieces);
+			path = filename;
 		} else {
-			path = pieces.get("path");
+			path = params.getValue("path");
 		}
 		if (!path.startsWith("/")) {
 			path = "/" + path;
 		}
 		path = path.replaceAll("/\\.\\.", "");
 
-		String serveFrom = pieces.get("serveFrom");
+		String serveFrom = params.getValue("serveFrom");
 		InputStream istream;
 		if (serveFrom != null && serveFrom.equals("classpath")) {
 			istream = getClass().getResourceAsStream(path);
@@ -57,12 +56,12 @@ public class StaticFileController implements ControllerBase {
 			throw new HttpError("File not Found", 404);
 		}
 
-		String contentType = getContentType(pieces, path);
+		String contentType = getContentType(params, path);
 		return new StaticFileStreamer(contentType, istream);
 	}
 
-	private String getContentType(Map<String, String> pieces, String path) {
-		String contentType = pieces.get("contentType");
+	private String getContentType(Params params, String path) {
+		String contentType = params.getValue("contentType");
 		if (contentType != null) {
 			return contentType;
 		}

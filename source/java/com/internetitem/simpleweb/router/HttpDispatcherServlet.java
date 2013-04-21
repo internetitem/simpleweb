@@ -2,7 +2,6 @@ package com.internetitem.simpleweb.router;
 
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletConfig;
@@ -14,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.internetitem.simpleweb.config.Configuration;
 import com.internetitem.simpleweb.config.ConfigurationException;
 import com.internetitem.simpleweb.config.ConfigurationFactory;
+import com.internetitem.simpleweb.utility.Params;
 
 public class HttpDispatcherServlet extends HttpServlet {
 
@@ -22,7 +22,7 @@ public class HttpDispatcherServlet extends HttpServlet {
 
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
-		Map<String, String> params = getParams(servletConfig);
+		Params params = getParams(servletConfig);
 
 		try {
 			Configuration config = ConfigurationFactory.getConfiguration(params);
@@ -33,13 +33,13 @@ public class HttpDispatcherServlet extends HttpServlet {
 		}
 	}
 
-	protected Map<String, String> getParams(ServletConfig servletConfig) {
-		Map<String, String> params = new HashMap<>();
+	protected Params getParams(ServletConfig servletConfig) {
+		Params params = new Params();
 		Enumeration<String> paramNames = servletConfig.getInitParameterNames();
 		while (paramNames.hasMoreElements()) {
 			String paramName = paramNames.nextElement();
 			String paramValue = servletConfig.getInitParameter(paramName);
-			params.put(paramName, paramValue);
+			params.setValue(paramName, paramValue);
 		}
 		return params;
 	}

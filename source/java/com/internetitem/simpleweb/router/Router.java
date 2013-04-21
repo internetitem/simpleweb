@@ -1,7 +1,6 @@
 package com.internetitem.simpleweb.router;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -9,40 +8,38 @@ import java.util.regex.Matcher;
 import com.internetitem.simpleweb.config.ConfigurationException;
 import com.internetitem.simpleweb.router.exception.HttpError;
 import com.internetitem.simpleweb.router.exception.HttpRedirect;
-import com.internetitem.simpleweb.utility.StringUtility;
+import com.internetitem.simpleweb.utility.Params;
 
 public class Router {
 
-	private Map<String, String> params;
+	private Params params;
 	private List<ControllerInfo> controllers;
 
 	public Router() {
 		this.controllers = new ArrayList<>();
 	}
 
-	public Map<String, String> routeRequest(String httpMethod, String path) throws HttpError, HttpRedirect {
+	public Params routeRequest(String httpMethod, String path) throws HttpError, HttpRedirect {
 		for (ControllerInfo controller : controllers) {
 			Matcher matcher = controller.getPattern().matcher(path);
 			if (!matcher.matches()) {
 				continue;
 			}
 
-			Map<String, String> pieces = new HashMap<>(params);
-			pieces.putAll(controller.getParams());
+			Params newParams = params.addParams(controller.getParams());
 			int groupNum = 1;
 			for (String partName : controller.getPartNames()) {
 				String value = matcher.group(groupNum);
-				pieces.put(partName, value);
+				newParams.setValue(partName, value);
 				groupNum++;
 			}
 
-			String redirect = pieces.get("redirect");
+			String redirect = newParams.getEvaluatedValue("redirect");
 			if (redirect != null) {
-				String newUrl = StringUtility.expandText(redirect, pieces);
-				throw new HttpRedirect(newUrl);
+				throw new HttpRedirect(redirect);
 			}
 
-			return pieces;
+			return newParams;
 		}
 		throw new HttpError("Not Found", 404);
 	}
@@ -51,10 +48,7 @@ public class Router {
 		controllers.add(new ControllerInfo(pattern, params));
 	}
 
-	public void setParams(Map<String, String> params) {
-		if (params == null) {
-			params = new HashMap<>();
-		}
+	public void setParams(Params params) {
 		this.params = params;
 	}
 

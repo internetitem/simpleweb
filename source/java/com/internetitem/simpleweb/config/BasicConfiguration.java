@@ -20,6 +20,7 @@ import com.internetitem.simpleweb.utility.Params;
 public class BasicConfiguration implements Configuration {
 	private Router router;
 	private Map<String, ControllerInstance> controllerMap;
+	private Params params;
 
 	private String routes;
 
@@ -34,7 +35,7 @@ public class BasicConfiguration implements Configuration {
 
 	@Override
 	public void init(Params params) throws ConfigurationException {
-		router.setParams(params);
+		this.params = params;
 		try {
 			Enumeration<URL> resources = BasicConfiguration.class.getClassLoader().getResources(routes);
 			while (resources.hasMoreElements()) {
@@ -77,11 +78,18 @@ public class BasicConfiguration implements Configuration {
 		return RouterConfig.parseFromStream(reader);
 	}
 
+	@Override
 	public Map<String, ControllerInstance> getControllerMap() {
 		return controllerMap;
 	}
 
+	@Override
 	public Router getRouter() {
 		return router;
+	}
+
+	@Override
+	public Params getParams() {
+		return params;
 	}
 }

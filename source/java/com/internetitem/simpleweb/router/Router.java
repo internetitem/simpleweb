@@ -1,55 +1,44 @@
 package com.internetitem.simpleweb.router;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
 import com.internetitem.simpleweb.config.ConfigurationException;
 import com.internetitem.simpleweb.router.exception.HttpError;
-import com.internetitem.simpleweb.router.exception.HttpRedirect;
-import com.internetitem.simpleweb.utility.Params;
 
 public class Router {
 
-	private Params params;
-	private List<ControllerInfo> controllers;
+	private List<RouteInfo> routes;
 
 	public Router() {
-		this.controllers = new ArrayList<>();
+		this.routes = new ArrayList<>();
 	}
 
-	public Params routeRequest(String httpMethod, String path) throws HttpError, HttpRedirect {
-		for (ControllerInfo controller : controllers) {
-			Matcher matcher = controller.getPattern().matcher(path);
+	public Map<String, String> routeRequest(String httpMethod, String path) throws HttpError {
+		for (RouteInfo route : routes) {
+			Matcher matcher = route.getPattern().matcher(path);
 			if (!matcher.matches()) {
 				continue;
 			}
 
-			Params newParams = params.addParams(controller.getParams());
+			Map<String, String> matchParams = new HashMap<>(route.getRouteParams());
 			int groupNum = 1;
-			for (String partName : controller.getPartNames()) {
+			for (String partName : route.getPartNames()) {
 				String value = matcher.group(groupNum);
-				newParams.setValue(partName, value);
+				matchParams.put(partName, value);
 				groupNum++;
 			}
 
-			String redirect = newParams.getEvaluatedValue("redirect");
-			if (redirect != null) {
-				throw new HttpRedirect(redirect);
-			}
-
-			return newParams;
+			return matchParams;
 		}
 		throw new HttpError("Not Found", 404);
 	}
 
 	public void addRoute(String pattern, Map<String, String> params) throws ConfigurationException {
-		controllers.add(new ControllerInfo(pattern, params));
-	}
-
-	public void setParams(Params params) {
-		this.params = params;
+		routes.add(new RouteInfo(pattern, params));
 	}
 
 }

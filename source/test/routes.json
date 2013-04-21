@@ -4,7 +4,6 @@
 			name: 'test',
 			className: 'com.internetitem.simpleweb.test.TestController',
 			params: {
-				which: 'override',
 				controllerParam: 'something'
 			}
 		},
@@ -18,7 +17,7 @@
 		}
 	],
 	routes: [
-		{ pattern: '/test/?', controller: 'test', action: 'test1', which: '1' },
+		{ pattern: '/test/?', controller: 'test', action: 'test1', which: '1', controllerParam='missing' },
 		{ pattern: '/test/:foo', controller: 'test', action: 'test1', which: '2' },
 		{ pattern: '/test/which/:which', controller: 'test', action: 'test1', which: '3'},
 		{ pattern: '/test/*', controller: 'test', action: 'test1', which: '4' },

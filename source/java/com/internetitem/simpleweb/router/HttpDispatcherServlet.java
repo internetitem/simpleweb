@@ -19,6 +19,7 @@ public class HttpDispatcherServlet extends HttpServlet {
 
 	private Router router;
 	private Map<String, ControllerInstance> controllerMap;
+	private Params params;
 
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
@@ -28,6 +29,7 @@ public class HttpDispatcherServlet extends HttpServlet {
 			Configuration config = ConfigurationFactory.getConfiguration(params);
 			router = config.getRouter();
 			controllerMap = config.getControllerMap();
+			this.params = params;
 		} catch (ConfigurationException e) {
 			throw new ServletException(e);
 		}
@@ -45,7 +47,7 @@ public class HttpDispatcherServlet extends HttpServlet {
 	}
 
 	void handleRequest(String method, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		RequestHandler.handleRequest(router, controllerMap, req, resp);
+		RequestHandler.handleRequest(params, router, controllerMap, req, resp);
 	}
 
 	@Override

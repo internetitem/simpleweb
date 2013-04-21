@@ -10,6 +10,8 @@ public interface Configuration {
 	Map<String, ControllerInstance> getControllerMap();
 
 	Router getRouter();
+	
+	Params getParams();
 
 	void init(Params params) throws ConfigurationException;
 }

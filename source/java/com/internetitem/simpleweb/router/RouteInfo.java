@@ -11,16 +11,16 @@ import org.slf4j.LoggerFactory;
 
 import com.internetitem.simpleweb.config.ConfigurationException;
 
-public class ControllerInfo {
+public class RouteInfo {
 
-	private static final Logger logger = LoggerFactory.getLogger(ControllerInfo.class);
+	private static final Logger logger = LoggerFactory.getLogger(RouteInfo.class);
 
 	private Pattern pattern;
 	private List<String> partNames;
-	private Map<String, String> params;
+	private Map<String, String> routeParams;
 
-	public ControllerInfo(String stringPattern, Map<String, String> params) throws ConfigurationException {
-		this.params = params;
+	public RouteInfo(String stringPattern, Map<String, String> routeParams) throws ConfigurationException {
+		this.routeParams = routeParams;
 		parsePattern(stringPattern);
 	}
 
@@ -105,8 +105,8 @@ public class ControllerInfo {
 		return pattern;
 	}
 
-	public Map<String, String> getParams() {
-		return params;
+	public Map<String, String> getRouteParams() {
+		return routeParams;
 	}
 
 	public List<String> getPartNames() {

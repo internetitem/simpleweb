@@ -22,18 +22,19 @@ public class SimpleWebHandler extends AbstractHandler {
 
 	private Router router;
 	private Map<String, ControllerInstance> controllerMap;
+	private Params params;
 
 	public SimpleWebHandler(Params params) throws ConfigurationException {
 		Configuration config = ConfigurationFactory.getConfiguration(params);
 		router = config.getRouter();
 		controllerMap = config.getControllerMap();
+		this.params = config.getParams();
 	}
 
 	@Override
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		RequestHandler.handleRequest(router, controllerMap, request, response);
+		RequestHandler.handleRequest(params, router, controllerMap, request, response);
 		baseRequest.setHandled(true);
 	}
-
 
 }

@@ -10,6 +10,9 @@ import java.util.Collection;
 
 import javax.servlet.ServletException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.internetitem.simpleweb.annotation.ControllerOptions;
 import com.internetitem.simpleweb.annotation.WebAction;
 import com.internetitem.simpleweb.router.ControllerBase;
@@ -21,8 +24,10 @@ import com.internetitem.simpleweb.utility.Params;
 @ControllerOptions(exposeAll = false)
 public class StaticFileController implements ControllerBase {
 
+	private static final Logger logger = LoggerFactory.getLogger(StaticFileController.class);
+
 	@WebAction
-	public StaticFileStreamer index(Params params) throws HttpError, ServletException, IOException {
+	public StaticFileStreamer index(Params params) throws HttpError, ServletException {
 		String filename = params.getEvaluatedValue("file");
 		String path;
 		if (filename != null) {
@@ -35,11 +40,26 @@ public class StaticFileController implements ControllerBase {
 		}
 		path = path.replaceAll("/\\.\\.", "");
 
-		File file = new File(path);
-		if (!file.isFile()) {
-			throw new HttpError("File Not Found", 404);
+		String serveFrom = params.getValue("serveFrom");
+		InputStream istream;
+		if (serveFrom != null && serveFrom.equals("classpath")) {
+			istream = getClass().getResourceAsStream(path);
+		} else {
+			try {
+				File file = new File(path);
+				if (!file.isFile()) {
+					throw new HttpError("File Not Found", 404);
+				}
+				istream = new FileInputStream(path);
+			} catch (IOException e) {
+				throw new HttpError(e.getMessage(), 404);
+			}
 		}
-		InputStream istream = new FileInputStream(path);
+
+		if (istream == null) {
+			logger.warn("Unable to find file " + path);
+			throw new HttpError("File not Found", 404);
+		}
 
 		String contentType = getContentType(params, path);
 		return new StaticFileStreamer(contentType, istream);

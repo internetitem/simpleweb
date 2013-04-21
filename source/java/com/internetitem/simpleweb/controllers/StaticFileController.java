@@ -27,7 +27,7 @@ public class StaticFileController implements ControllerBase {
 	private static final Logger logger = LoggerFactory.getLogger(StaticFileController.class);
 
 	@WebAction
-	public StaticFileStreamer index(Params params) throws HttpError, ServletException {
+	public StaticFileStreamer index(Params params) throws HttpError, IOException, ServletException {
 		String filename = params.getEvaluatedValue("file");
 		String path;
 		if (filename != null) {
@@ -45,15 +45,11 @@ public class StaticFileController implements ControllerBase {
 		if (serveFrom != null && serveFrom.equals("classpath")) {
 			istream = getClass().getResourceAsStream(path);
 		} else {
-			try {
-				File file = new File(path);
-				if (!file.isFile()) {
-					throw new HttpError("File Not Found", 404);
-				}
-				istream = new FileInputStream(path);
-			} catch (IOException e) {
-				throw new HttpError(e.getMessage(), 404);
+			File file = new File(path);
+			if (!file.isFile()) {
+				throw new HttpError("File Not Found", 404);
 			}
+			istream = new FileInputStream(path);
 		}
 
 		if (istream == null) {

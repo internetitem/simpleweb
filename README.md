@@ -129,5 +129,5 @@ Configured using the following Params:
  * `serveFrom` - If set to `classpath` then files are served from the classpath. Otherwise they are served from the filesystem
  * `contentType` - If this is set, it is used as the `Content-Type` for all files served. Otherwise the content type is automatically detected using the filename
 
-
+**WARNING:** It appears that Java treats directories as "files" when loading them from the classpath (with `getResourceAsStream()`). The "contents" of this file appears to be a directory listing. This means that it may be possible to construct a URL in which a directory's contents is returned to the user.
 

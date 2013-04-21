@@ -11,6 +11,7 @@ import java.util.Map;
 
 import com.internetitem.simpleweb.config.dataModel.router.RouterConfig;
 import com.internetitem.simpleweb.config.dataModel.router.RouterController;
+import com.internetitem.simpleweb.router.BasicDispatcher;
 import com.internetitem.simpleweb.router.ControllerBase;
 import com.internetitem.simpleweb.router.ControllerInstance;
 import com.internetitem.simpleweb.router.Dispatcher;
@@ -70,7 +71,7 @@ public class BasicConfiguration implements Configuration {
 		} catch (Exception e) {
 			throw new ConfigurationException("Error initializing BasicConfiguration: " + e.getMessage(), e);
 		}
-		return new Dispatcher(params, router, controllerMap);
+		return new BasicDispatcher(params, router, controllerMap);
 	}
 
 	private ControllerInstance buildController(String className, Map<String, String> controllerParams, Params params) throws Exception {

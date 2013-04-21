@@ -42,7 +42,7 @@ public class HttpDispatcherServlet extends HttpServlet {
 	}
 
 	void handleRequest(String method, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		dispatcher.handleRequest(req, resp);
+		dispatcher.dispatchRequest(req, resp);
 	}
 
 	@Override

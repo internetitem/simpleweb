@@ -26,7 +26,7 @@ public class SimpleWebHandler extends AbstractHandler {
 
 	@Override
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		dispatcher.handleRequest(request, response);
+		dispatcher.dispatchRequest(request, response);
 		baseRequest.setHandled(true);
 	}
 

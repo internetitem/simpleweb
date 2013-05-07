@@ -1,7 +1,25 @@
-<project name="SimpleWeb" xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="SimpleWeb" xmlns:ivy="antlib:org.apache.ivy.ant" default="jar">
 
 	<property file="build.properties" />
 
+	<target name="jar" depends="compile">
+		<jar destfile="${build.dist.dir}/${jar.name}">
+			<fileset dir="${build.classes.dir}" includes="**/*.class" />
+			<fileset dir="${source.resources.dir}" includes="**" />
+		</jar>
+	</target>
+	
+	<target name="compile" depends="prepare, deps">
+		<javac
+			srcdir="${source.java.dir}"
+			destdir="${build.classes.dir}"
+			includeantruntime="false">
+			<classpath>
+				<fileset dir="${build.lib.dir}/jar" includes="*.jar" />
+			</classpath>
+		</javac>
+	</target>
+	
 	<target name="deps" depends="fetch-deps">
 	</target>
 
@@ -14,6 +32,7 @@
 	<target name="prepare">
 		<mkdir dir="${build.root.dir}" />
 		<mkdir dir="${build.classes.dir}" />
+		<mkdir dir="${build.dist.dir}" />
 	</target>
 
 	<target name="clean">
